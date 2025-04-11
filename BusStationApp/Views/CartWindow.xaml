@@ -1,0 +1,70 @@
+﻿<Window x:Class="ComputerShop.Views.CartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Моя корзина" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 8">
+            <materialDesign:PackIcon Kind="Cart" Width="24" Height="24" Margin="0 0 8 0"/>
+            <TextBlock Text="Моя корзина" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+        </StackPanel>
+
+        <materialDesign:Card Grid.Row="1" UniformCornerRadius="8" Margin="0 8" Padding="0">
+            <DataGrid ItemsSource="{Binding CartItems}" AutoGenerateColumns="False"
+                     Style="{StaticResource MaterialDesignDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Товар" Binding="{Binding ProductName}" Width="*"/>
+                    <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat={}{0:C}}"/>
+                    <DataGridTemplateColumn Header="Количество">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Command="{Binding DecreaseQuantityCommand}" 
+                                           Style="{StaticResource MaterialDesignIconButton}"
+                                           Content="{materialDesign:PackIcon Kind=Remove}"/>
+                                    <TextBox Text="{Binding Quantity}" Width="40" Margin="8 0"
+                                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                            TextAlignment="Center"/>
+                                    <Button Command="{Binding IncreaseQuantityCommand}"
+                                           Style="{StaticResource MaterialDesignIconButton}"
+                                           Content="{materialDesign:PackIcon Kind=Add}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Сумма" Binding="{Binding TotalPrice, StringFormat={}{0:C}}"/>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding RemoveItemCommand}"
+                                       Style="{StaticResource MaterialDesignIconButton}"
+                                       ToolTip="Удалить"
+                                       Content="{materialDesign:PackIcon Kind=Delete}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Row="2" UniformCornerRadius="8" Margin="0 8" Padding="16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="{Binding TotalCartPrice, StringFormat='Итого: {0:C}'}" 
+                          Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                          VerticalAlignment="Center"/>
+                <Button Content="Продолжить покупки" Command="{Binding ContinueShoppingCommand}"
+                       Margin="16 0" Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                <Button Content="Оформить заказ" Command="{Binding CheckoutCommand}"
+                       Style="{StaticResource MaterialDesignRaisedButton}"/>
+            </StackPanel>
+        </materialDesign:Card>
+    </Grid>
+</Window>
