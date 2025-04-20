@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="CompShop.Views.CategoryDetailsWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:ComputerShop.Views">
+
+    <materialDesign:Card UniformCornerRadius="8" Margin="16" Padding="16">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 16">
+                <materialDesign:PackIcon Kind="Category" Width="32" Height="32" Margin="0 0 8 0"/>
+                <TextBlock Text="Детали категории" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+            </StackPanel>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="ID:" Grid.Row="0" Grid.Column="0" 
+                          Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0 0 8 8"/>
+                <TextBlock Text="{Binding Category.Id}" Grid.Row="0" Grid.Column="1" 
+                          Style="{StaticResource MaterialDesignBody1TextBlock}" Margin="0 0 0 8"/>
+
+                <TextBlock Text="Название:" Grid.Row="1" Grid.Column="0" 
+                          Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0 0 8 8"/>
+                <TextBlock Text="{Binding Category.Name}" Grid.Row="1" Grid.Column="1" 
+                          Style="{StaticResource MaterialDesignBody1TextBlock}" Margin="0 0 0 8"/>
+
+                <TextBlock Text="Количество товаров:" Grid.Row="2" Grid.Column="0" 
+                          Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0 0 8 8"/>
+                <TextBlock Text="{Binding Category.ProductCount}" Grid.Row="2" Grid.Column="1" 
+                          Style="{StaticResource MaterialDesignBody1TextBlock}" Margin="0 0 0 8"/>
+
+                <TextBlock Text="Родительская категория:" Grid.Row="3" Grid.Column="0" 
+                          Style="{StaticResource MaterialDesignSubtitle1TextBlock}" Margin="0 0 8 0"/>
+                <TextBlock Text="{Binding Category.ParentCategory.Name}" Grid.Row="3" Grid.Column="1" 
+                          Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+            </Grid>
+
+            <Button Content="Назад" Command="{Binding BackCommand}"
+                   HorizontalAlignment="Right" Margin="0 16 0 0"/>
+        </StackPanel>
+    </materialDesign:Card>
+</UserControl>

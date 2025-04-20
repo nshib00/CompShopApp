@@ -1,0 +1,48 @@
+﻿<Window x:Class="ComputerShop.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:helpers="clr-namespace:CompShop.Helpers"
+        Title="CompShop | Вход"
+        Height="400" Width="400"
+        WindowStartupLocation="CenterScreen">
+
+    <materialDesign:Card UniformCornerRadius="8" Margin="16" Padding="16">
+        <StackPanel Margin="0,0,0,-12">
+
+            <materialDesign:PackIcon Kind="AccountCircle"
+                                     Width="64" Height="64"
+                                     HorizontalAlignment="Center" Margin="0 16"/>
+
+            <TextBlock Text="Вход в систему"
+                       Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                       HorizontalAlignment="Center"/>
+
+            <!-- Email -->
+            <TextBox materialDesign:HintAssist.Hint="Email"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Пароль -->
+            <PasswordBox materialDesign:HintAssist.Hint="Пароль"
+                         x:Name="txtPassword"
+                         helpers:PasswordXAMLHelper.Attach="True"
+                         Margin="0 0 0 8"/>
+
+            <!-- Кнопка входа -->
+            <Button Content="Войти"
+                    Command="{Binding LoginCommand}"
+                    CommandParameter="{Binding ElementName=txtPassword, Path=(helpers:PasswordXAMLHelper.Password)}"
+                    HorizontalAlignment="Stretch" Margin="0 16"
+                    materialDesign:ButtonProgressAssist.Value="-1"/>
+
+            <!-- Ссылка на регистрацию -->
+            <TextBlock HorizontalAlignment="Center" Margin="0 8">
+                <Hyperlink NavigateUri="http://example.com"
+                           RequestNavigate="Hyperlink_RequestNavigate">
+                    Зарегистрироваться
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+    </materialDesign:Card>
+</Window>
