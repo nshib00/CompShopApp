@@ -14,9 +14,12 @@ namespace CompShop.ViewModels
         private readonly CategoryModel _categoryModel;
         private string _name;
         private int? _parentCategoryId;
+        private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
 
         public event Action OnCategoryUpdated;
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public Action CloseAction { get; set; }
 
         public EditCategoryVM(CategoryModel categoryModel, int categoryId)
         {
@@ -50,9 +53,19 @@ namespace CompShop.ViewModels
             }
         }
 
-        public ObservableCollection<CategoryShortDto> Categories { get; } = new ObservableCollection<CategoryShortDto>();
+        public ObservableCollection<CategoryShortDto> Categories => _categories;
+
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
+
+        public void SetCategories(ObservableCollection<CategoryShortDto> categories)
+        {
+            _categories.Clear();
+            foreach (var category in categories)
+            {
+                _categories.Add(category);
+            }
+        }
 
         private void LoadCategoryData()
         {
@@ -77,6 +90,7 @@ namespace CompShop.ViewModels
 
                 _categoryModel.UpdateCategory(dto);
                 OnCategoryUpdated?.Invoke();
+                CloseAction?.Invoke();
             }
             catch (Exception ex)
             {
@@ -88,6 +102,7 @@ namespace CompShop.ViewModels
         private void Cancel()
         {
             OnCategoryUpdated?.Invoke();
+            CloseAction?.Invoke();
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

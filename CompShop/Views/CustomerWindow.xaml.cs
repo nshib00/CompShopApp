@@ -1,36 +1,51 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
 using BLL.DTO;
+using CompShop.ViewModels;
 
 namespace ComputerShop.Views
 {
     public partial class CustomerWindow : Window
     {
+        private readonly CustomerVM _viewModel;
+
         public CustomerWindow()
         {
             InitializeComponent();
-            LoadProducts();
+            _viewModel = new CustomerVM();
+            this.DataContext = _viewModel;
+
+            // Подключение обработчиков событий
+            this.Loaded += CustomerWindow_Loaded;
         }
 
-        // Загрузка списка продуктов (пример, можно заменить на реальную загрузку из БД)
-        private void LoadProducts()
+        private void CustomerWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var products = new List<ProductDto>
-            {
-                new ProductDto { Id = 1, Name = "Товар 1", Description = "Описание товара 1", Price = 1000, CategoryName = "Категория 1" },
-                new ProductDto { Id = 2, Name = "Товар 2", Description = "Описание товара 2", Price = 1500, CategoryName = "Категория 2" },
-                new ProductDto { Id = 3, Name = "Товар 3", Description = "Описание товара 3", Price = 2000, CategoryName = "Категория 3" }
-            };
-
-            ProductsItemsControl.ItemsSource = products;
+            // Загрузка категорий и товаров
+            _viewModel.LoadCategories();
+            _viewModel.LoadProducts();
         }
 
-        // Обработка кнопки "Войти/Выйти"
-        private void LoginLogout_Click(object sender, RoutedEventArgs e)
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var loginWindow = new MainWindow();
-            loginWindow.Show();
-            this.Close();
+            // Обновляем поисковый текст в ViewModel
+            _viewModel.SearchText = SearchTextBox.Text;
+        }
+
+        private void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Обновляем выбранную категорию в ViewModel
+            _viewModel.SelectedCategory = (CategoryDto)CategoryComboBox.SelectedItem;
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Логика для выхода из системы
+            _viewModel.Logout(sender);
+        }
+
+        private void Image_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
         }
     }
 }

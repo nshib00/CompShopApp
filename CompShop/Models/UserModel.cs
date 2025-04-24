@@ -63,7 +63,7 @@ namespace ComputerShop.Models
             return user != null ? new UserDto(user) : null;
         }
 
-        public UserDto Login(UserLoginDto dto)
+        public UserDto? Login(UserLoginDto dto)
         {
             var user = _context.Users
                 .FirstOrDefault(u => u.Email == dto.Email);
@@ -72,17 +72,7 @@ namespace ComputerShop.Models
             {
                 return new UserDto(user);
             }
-
             return null;
-        }
-
-        public bool CheckPassword(UserLoginDto dto)
-        {
-            if (1 == 1)
-            {
-                return true;
-            }
-            return false;
         }
     }
 }

@@ -12,3 +12,4 @@ D:\projects\CompShop\DAL\obj\Debug\net8.0\DAL.pdb
 D:\projects\CompShop\DAL\obj\Debug\net8.0\ref\DAL.dll
 D:\projects\CompShop\DAL\bin\Debug\net8.0\DAL.runtimeconfig.json
 D:\projects\CompShop\DAL\obj\Debug\net8.0\DAL.genruntimeconfig.cache
+D:\projects\CompShop\DAL\obj\Debug\net8.0\DAL.sourcelink.json

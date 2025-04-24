@@ -9,14 +9,17 @@ namespace BLL.Model
     {
         private readonly AppDbContext _context = new AppDbContext();
 
-        public int CreateProduct(ProductDto dto)
+        public int CreateProduct(FullProductDto dto)
         {
             var product = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
-                CategoryId = dto.CategoryId
+                StockQuantity = dto.StockQuantity,
+                CategoryId = dto.CategoryId,
+                ManufacturerId = dto.ManufacturerId,
+                ImagePath = dto.ImagePath,
             };
 
             _context.Products.Add(product);
@@ -25,7 +28,7 @@ namespace BLL.Model
             return product.Id;
         }
 
-        public void UpdateProduct(ProductDto dto)
+        public void UpdateProduct(FullProductDto dto)
         {
             var product = _context.Products.Find(dto.Id);
             if (product != null)
@@ -34,6 +37,9 @@ namespace BLL.Model
                 product.Description = dto.Description;
                 product.Price = dto.Price;
                 product.CategoryId = dto.CategoryId;
+                product.StockQuantity = dto.StockQuantity;
+                product.ManufacturerId = dto.ManufacturerId;
+                product.ImagePath = dto.ImagePath;
 
                 _context.SaveChanges();
             }
@@ -57,6 +63,15 @@ namespace BLL.Model
                 .ToList();
         }
 
+        public List<ProductDto> GetProductsByCategory(int categoryId)
+        {
+            return _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.CategoryId == categoryId)
+                .Select(p => new ProductDto(p))
+                .ToList();
+        }
+
         public ProductDto? GetProductById(int id)
         {
             var product = _context.Products
@@ -70,6 +85,30 @@ namespace BLL.Model
         {
             return _context.Products
                 .Select(p => new ProductShortDto(p))
+                .ToList();
+        }
+
+        public List<ProductDto> GetProductsBySearch(string searchText, int? categoryId = null)
+        {
+            var query = _context.Products
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            // Если указан текст поиска, добавляем фильтрацию по имени и описанию
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                query = query.Where(p => p.Name.Contains(searchText) || p.Description.Contains(searchText));
+            }
+
+            // Если указана категория, добавляем фильтрацию по категории
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            // Преобразуем в список и возвращаем результат
+            return query
+                .Select(p => new ProductDto(p)) // Преобразуем сущности в ProductDto
                 .ToList();
         }
     }

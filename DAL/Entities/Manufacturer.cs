@@ -19,8 +19,6 @@ namespace DAL.Entities
         [StringLength(50)]
         public string Country { get; set; }
 
-        public DateTime FoundedYear { get; set; }
-
         public virtual ICollection<Product> Products { get; set; }
     }
 }

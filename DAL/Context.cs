@@ -64,11 +64,6 @@ namespace DAL.Context
                     .HasForeignKey(p => p.ManufacturerId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(p => p.Discount)
-                    .WithMany(d => d.Products)
-                    .HasForeignKey(p => p.DiscountId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
                 entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
             });
 

@@ -1,0 +1,28 @@
+﻿<Window x:Class="CompShop.Views.EditManufacturerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Редактировать производителя" Height="400" Width="450"
+        WindowStartupLocation="CenterScreen">
+
+    <materialDesign:Card Margin="16" Padding="16">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 16">
+                <materialDesign:PackIcon Kind="Factory" Width="32" Height="32" Margin="0 0 8 0"/>
+                <TextBlock Text="Редактировать производителя" Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+            </StackPanel>
+
+            <TextBox materialDesign:HintAssist.Hint="Название" Text="{Binding Name}" Margin="0 8"/>
+            <TextBox materialDesign:HintAssist.Hint="Описание" Text="{Binding Description}" Margin="0 8"
+                     AcceptsReturn="True" Height="100" VerticalScrollBarVisibility="Auto"/>
+            <TextBox materialDesign:HintAssist.Hint="Страна" Text="{Binding Country}" Margin="0 8"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 16 0 0">
+                <Button Content="Отмена" Command="{Binding CancelCommand}" 
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Height="35"/>
+                <Button Content="Сохранить" Command="{Binding SaveManufacturerCommand}" 
+                        Margin="8 0 0 0" Height="35"/>
+            </StackPanel>
+        </StackPanel>
+    </materialDesign:Card>
+</Window>

@@ -58,9 +58,6 @@ namespace DAL.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ProductId1")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
@@ -69,8 +66,6 @@ namespace DAL.Migrations
                     b.HasIndex("CartId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductId1");
 
                     b.ToTable("CartItems", "public");
                 });
@@ -181,9 +176,6 @@ namespace DAL.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<DateTime>("FoundedYear")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -243,9 +235,6 @@ namespace DAL.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ProductId1")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
@@ -261,8 +250,6 @@ namespace DAL.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductId1");
 
                     b.ToTable("OrderDetails", "public");
                 });
@@ -304,8 +291,8 @@ namespace DAL.Migrations
                     b.Property<int?>("DiscountId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("text");
 
                     b.Property<int?>("ManufacturerId")
                         .HasColumnType("integer");
@@ -357,24 +344,6 @@ namespace DAL.Migrations
                     b.ToTable("Receipts", "public");
                 });
 
-            modelBuilder.Entity("DAL.Entities.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles", "public");
-                });
-
             modelBuilder.Entity("DAL.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -416,8 +385,6 @@ namespace DAL.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("Users", "public");
                 });
 
@@ -445,10 +412,6 @@ namespace DAL.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("DAL.Entities.Product", null)
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId1");
 
                     b.Navigation("Cart");
 
@@ -518,10 +481,6 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DAL.Entities.Product", null)
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ProductId1");
-
                     b.Navigation("Discount");
 
                     b.Navigation("Order");
@@ -535,10 +494,9 @@ namespace DAL.Migrations
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("DAL.Entities.Discount", "Discount")
+                    b.HasOne("DAL.Entities.Discount", null)
                         .WithMany("Products")
-                        .HasForeignKey("DiscountId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("DiscountId");
 
                     b.HasOne("DAL.Entities.Manufacturer", "Manufacturer")
                         .WithMany("Products")
@@ -546,8 +504,6 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
-
-                    b.Navigation("Discount");
 
                     b.Navigation("Manufacturer");
                 });
@@ -561,16 +517,6 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("DAL.Entities.User", b =>
-                {
-                    b.HasOne("DAL.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("DAL.Entities.Cart", b =>
@@ -611,18 +557,6 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Entities.OrderStatus", b =>
                 {
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("DAL.Entities.Product", b =>
-                {
-                    b.Navigation("CartItems");
-
-                    b.Navigation("OrderDetails");
-                });
-
-            modelBuilder.Entity("DAL.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("DAL.Entities.User", b =>

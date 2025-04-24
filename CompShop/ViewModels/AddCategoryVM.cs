@@ -12,9 +12,12 @@ public class AddCategoryVM : INotifyPropertyChanged
     private readonly CategoryModel _categoryModel;
     private string _name;
     private int? _parentCategoryId;
+    private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
 
     public event Action OnCategoryAdded;
     public event PropertyChangedEventHandler PropertyChanged;
+
+    public Action CloseAction { get; set; }
 
     public AddCategoryVM(CategoryModel categoryModel)
     {
@@ -43,9 +46,19 @@ public class AddCategoryVM : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<CategoryShortDto> Categories { get; } = new ObservableCollection<CategoryShortDto>();
+    public ObservableCollection<CategoryShortDto> Categories => _categories;
+
     public ICommand SaveCommand { get; }
     public ICommand CancelCommand { get; }
+
+    public void SetCategories(ObservableCollection<CategoryShortDto> categories)
+    {
+        _categories.Clear();
+        foreach (var category in categories)
+        {
+            _categories.Add(category);
+        }
+    }
 
     private void SaveCategory()
     {
@@ -59,6 +72,7 @@ public class AddCategoryVM : INotifyPropertyChanged
 
             _categoryModel.CreateCategory(dto);
             OnCategoryAdded?.Invoke();
+            CloseAction?.Invoke();
         }
         catch (Exception ex)
         {
@@ -69,7 +83,8 @@ public class AddCategoryVM : INotifyPropertyChanged
 
     private void Cancel()
     {
-        OnCategoryAdded?.Invoke();
+
+        CloseAction?.Invoke();
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -7,6 +7,7 @@ namespace BLL.DTO
         public int Id { get; set; }
         public string Name { get; set; }
         public int ProductCount { get; set; }
+        public string? ParentCategoryName { get; set; }
 
         public CategoryDto() { }
 
@@ -15,6 +16,7 @@ namespace BLL.DTO
             Id = category.Id;
             Name = category.Name;
             ProductCount = category.Products?.Count ?? 0;
+            ParentCategoryName = category.ParentCategory?.Name;
         }
     }
 
@@ -79,6 +81,12 @@ namespace BLL.DTO
         {
             Id = dto.Id;
             Name = dto.Name;
+        }
+
+        public CategoryShortDto(Category cat)
+        {
+            Id = cat.Id;
+            Name = cat.Name;
         }
     }
 }

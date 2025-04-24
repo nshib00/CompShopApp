@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using CompShop.Views.Pages;
+using System.Windows;
 
 namespace ComputerShop.Views
 {
@@ -7,6 +8,11 @@ namespace ComputerShop.Views
         public AdminWindow()
         {
             InitializeComponent();
+
+            ProductFrame.NavigationService.Navigate(new ProductPage());
+            CategoryFrame.NavigationService.Navigate(new CategoryPage());
+            //OrderFrame.NavigationService.Navigate(new OrderPage());
+            ManufacturerFrame.NavigationService.Navigate(new ManufacturerPage());
         }
     }
 }

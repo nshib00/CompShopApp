@@ -29,8 +29,8 @@
             <TabItem Header="Заказы">
                 <Frame x:Name="OrderFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
-            <TabItem Header="Пользователи">
-                <Frame x:Name="UserFrame" NavigationUIVisibility="Hidden"/>
+            <TabItem Header="Производители">
+                <Frame x:Name="ManufacturerFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
         </TabControl>
     </Grid>

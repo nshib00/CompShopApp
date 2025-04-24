@@ -1,4 +1,6 @@
 ﻿using BLL.DTO;
+using CompShop.ViewModels;
+using CompShop.Views;
 using ComputerShop.Commands;
 using ComputerShop.Models;
 using ComputerShop.Views;
@@ -108,20 +110,20 @@ namespace ComputerShop.ViewModels
 
         private void ShowAddCategoryView()
         {
-            var viewModel = new AddCategoryVM(_categoryModel)
+            var addCategoryVM = new AddCategoryVM(_categoryModel);
+            addCategoryVM.OnCategoryAdded += () =>
             {
-                Categories = new ObservableCollection<CategoryShortDto>(AvailableParentCategories),
-                OnCategoryAdded = () =>
-                {
-                    LoadCategories();
-                    MessageBox.Show("Категория успешно добавлена", "Успех",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                LoadCategories();
+                MessageBox.Show("Категория успешно добавлена", "Успех",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             };
+
+            var availableCategories = new ObservableCollection<CategoryShortDto>(AvailableParentCategories);
+            addCategoryVM.SetCategories(availableCategories);
 
             var window = new AddCategoryWindow
             {
-                DataContext = viewModel,
+                DataContext = addCategoryVM,
                 Owner = Application.Current.MainWindow
             };
             window.ShowDialog();
@@ -131,21 +133,21 @@ namespace ComputerShop.ViewModels
         {
             if (SelectedCategory == null) return;
 
-            var viewModel = new EditCategoryVM(_categoryModel, SelectedCategory.Id)
+            var editCategoryVM = new EditCategoryVM(_categoryModel, SelectedCategory.Id);
+            editCategoryVM.OnCategoryUpdated += () =>
             {
-                Categories = new ObservableCollection<CategoryShortDto>(AvailableParentCategories
-                    .Where(c => c.Id != SelectedCategory.Id).ToList()),
-                OnCategoryUpdated = () =>
-                {
-                    LoadCategories();
-                    MessageBox.Show("Категория успешно обновлена", "Успех",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                LoadCategories();
+                MessageBox.Show("Категория успешно обновлена", "Успех",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             };
+
+            var availableCategories = new ObservableCollection<CategoryShortDto>(
+                AvailableParentCategories.Where(c => c.Id != SelectedCategory.Id).ToList());
+            editCategoryVM.SetCategories(availableCategories);
 
             var window = new EditCategoryWindow
             {
-                DataContext = viewModel,
+                DataContext = editCategoryVM,
                 Owner = Application.Current.MainWindow
             };
             window.ShowDialog();
@@ -155,14 +157,12 @@ namespace ComputerShop.ViewModels
         {
             if (SelectedCategory == null) return;
 
-            var viewModel = new CategoryDetailsVM(_categoryModel, SelectedCategory.Id)
-            {
-                OnBackRequested = () => { /* можно добавить логику при необходимости */ }
-            };
+            var detailsVM = new CategoryDetailsVM(_categoryModel, SelectedCategory.Id);
+            detailsVM.OnBackRequested += () => { /* можно добавить логику при необходимости */ };
 
             var window = new CategoryDetailsWindow
             {
-                DataContext = viewModel,
+                DataContext = detailsVM,
                 Owner = Application.Current.MainWindow
             };
             window.ShowDialog();

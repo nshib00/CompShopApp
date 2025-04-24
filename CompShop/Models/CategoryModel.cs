@@ -137,5 +137,15 @@ namespace ComputerShop.Models
                     .ToList() ?? new List<CategoryTreeDto>()
             };
         }
+
+        public List<CategoryDto> SearchCategories(string query)
+        {
+            return _context.Categories
+                .Include(c => c.Products)
+                .Where(c => c.Name.Contains(query))
+                .AsNoTracking()
+                .Select(c => new CategoryDto(c))
+                .ToList();
+        }
     }
 }
