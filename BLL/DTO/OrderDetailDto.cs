@@ -8,7 +8,10 @@ namespace BLL.DTO
         public string ProductName { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public decimal TotalPrice => Quantity * UnitPrice;
+        public decimal TotalPrice
+        {
+            get => Quantity * UnitPrice;
+        }
 
         public OrderDetailDto() { }
 

@@ -1,15 +1,15 @@
 ﻿using DAL.Entities;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-public class CartItemDto
+public class CartItemDto : INotifyPropertyChanged
 {
     public int ProductId { get; set; }
     public string ProductName { get; set; }
     public double Price { get; set; }
 
     private int _quantity;
-
     public int Quantity
     {
         get => _quantity;
@@ -18,13 +18,13 @@ public class CartItemDto
             if (_quantity != value && value >= 1)
             {
                 _quantity = value;
-                OnPropertyChanged(nameof(Quantity));
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(TotalPrice)); // Обновляем сумму для конкретного товара
             }
         }
     }
 
-    public double TotalPrice => Price * Quantity; // Сумма для конкретного товара
+    public double TotalPrice => Price * Quantity;
 
     public ICommand IncreaseQuantityCommand { get; set; }
     public ICommand DecreaseQuantityCommand { get; set; }
@@ -32,7 +32,7 @@ public class CartItemDto
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    protected virtual void OnPropertyChanged(string propertyName) =>
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public CartItemDto() { }

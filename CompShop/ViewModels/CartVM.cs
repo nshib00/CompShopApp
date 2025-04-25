@@ -1,25 +1,23 @@
 ﻿using ComputerShop.Commands;
 using ComputerShop.Models;
 using ComputerShop.Views;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows.Input;
 using System.Windows;
+using System.Windows.Input;
 
 public class CartVM : INotifyPropertyChanged
 {
     private readonly CartModel _cartModel;
     private ObservableCollection<CartItemDto> _cartItems;
     private double _totalCartPrice;
+    private int _currentUserId;
+    private int _cartId;
 
-    // Событие для закрытия окна
     public event Action CloseWindowRequested;
+    public event Action CartUpdated;
 
-    // Свойство для списка товаров в корзине
     public ObservableCollection<CartItemDto> CartItems
     {
         get => _cartItems;
@@ -42,7 +40,6 @@ public class CartVM : INotifyPropertyChanged
         }
     }
 
-    // Свойство для общей суммы корзины
     public double TotalCartPrice
     {
         get => _totalCartPrice;
@@ -56,33 +53,31 @@ public class CartVM : INotifyPropertyChanged
         }
     }
 
-    // Команды для продолжения покупок и оформления заказа
     public ICommand ContinueShoppingCommand { get; set; }
     public ICommand CheckoutCommand { get; set; }
 
-    // Конструктор
     public CartVM(int userId)
     {
+        _currentUserId = userId;
         _cartModel = new CartModel();
-        LoadCart(userId);
+        LoadCart();
 
         ContinueShoppingCommand = new RelayCommand(ContinueShopping);
         CheckoutCommand = new RelayCommand(Checkout);
     }
 
-    // Метод для загрузки корзины
-    public void LoadCart(int userId)
+    public void LoadCart()
     {
-        var cart = _cartModel.GetCartByUserId(userId);
+        var cart = _cartModel.GetCartByUserId(_currentUserId);
 
         if (cart != null)
         {
+            _cartId = cart.Id;
             CartItems = new ObservableCollection<CartItemDto>(cart.Items);
             InitItemCommands();
         }
     }
 
-    // Инициализация команд для каждого товара
     private void InitItemCommands()
     {
         if (CartItems == null) return;
@@ -95,34 +90,42 @@ public class CartVM : INotifyPropertyChanged
             item.IncreaseQuantityCommand = new RelayCommand(_ =>
             {
                 item.Quantity++;
+                var cart = _cartModel.GetCartByUserId(_currentUserId);
+                if (cart != null)
+                    _cartModel.IncreaseProductQuantity(cart.Id, item.ProductId, 1);
             });
 
             item.DecreaseQuantityCommand = new RelayCommand(_ =>
             {
                 if (item.Quantity > 1)
+                {
                     item.Quantity--;
+                    var cart = _cartModel.GetCartByUserId(_currentUserId);
+                    if (cart != null)
+                        _cartModel.DecreaseProductQuantity(cart.Id, item.ProductId, 1);
+                }
             });
 
             item.RemoveItemCommand = new RelayCommand(_ =>
             {
+                _cartModel.RemoveProductFromCart(_cartId, item.ProductId);
                 CartItems.Remove(item);
                 RecalculateTotal();
             });
         }
     }
 
-    // Метод для изменения количества товара в корзине
     private void OnCartItemPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CartItemDto.Quantity) || e.PropertyName == nameof(CartItemDto.TotalPrice))
         {
             RecalculateTotal();
         }
+        CartUpdated?.Invoke();
     }
 
     private void OnCartItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        // Отписка от удалённых элементов
         if (e.OldItems != null)
         {
             foreach (CartItemDto oldItem in e.OldItems)
@@ -131,7 +134,6 @@ public class CartVM : INotifyPropertyChanged
             }
         }
 
-        // Подписка на новые элементы
         if (e.NewItems != null)
         {
             foreach (CartItemDto newItem in e.NewItems)
@@ -141,62 +143,54 @@ public class CartVM : INotifyPropertyChanged
                 newItem.IncreaseQuantityCommand = new RelayCommand(_ =>
                 {
                     newItem.Quantity++;
+                    _cartModel.IncreaseProductQuantity(_cartId, newItem.ProductId, 1);
                 });
 
                 newItem.DecreaseQuantityCommand = new RelayCommand(_ =>
                 {
                     if (newItem.Quantity > 1)
+                    {
                         newItem.Quantity--;
+                        _cartModel.DecreaseProductQuantity(_cartId, newItem.ProductId, 1);
+                    }
                 });
 
                 newItem.RemoveItemCommand = new RelayCommand(_ =>
                 {
+                    _cartModel.RemoveProductFromCart(_cartId, newItem.ProductId);
                     CartItems.Remove(newItem);
                     RecalculateTotal();
                 });
             }
         }
 
-        // Обновляем общую сумму после изменений
+        CartUpdated?.Invoke();
         RecalculateTotal();
     }
 
-
-
-    // Метод для пересчета общей суммы корзины
-    public void RecalculateTotal()
+    private void RecalculateTotal()
     {
-        if (CartItems != null)
-            TotalCartPrice = CartItems.Sum(item => item.Price * item.Quantity);
-        else
-            TotalCartPrice = 0;
+        TotalCartPrice = CartItems?.Sum(item => item.Price * item.Quantity) ?? 0;
     }
 
-    // Метод для продолжения покупок (закрытие окна корзины)
     private void ContinueShopping(object obj)
     {
         CloseWindowRequested?.Invoke();
     }
 
-    // Метод для оформления заказа
     private void Checkout(object obj)
     {
-        // Если корзина пуста, показать сообщение
         if (CartItems == null || CartItems.Count == 0)
         {
             MessageBox.Show("Ваша корзина пуста. Добавьте товары перед оформлением заказа.", "Оформление заказа", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        // Открыть окно оформления заказа
-        var orderWindow = new OrderWindow(); // передаем список товаров
+        var orderWindow = new OrderWindow(_currentUserId);
         orderWindow.Show();
-
-        // Закрыть окно корзины после открытия окна заказа
         CloseWindowRequested?.Invoke();
     }
 
-    // Событие изменения свойств
     public event PropertyChangedEventHandler PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)

@@ -29,7 +29,7 @@
                       Margin="0 0 0 30"/>
 
             <Button Content="Вернуться в каталог" Command="{Binding ReturnToCatalogCommand}"
-                   HorizontalAlignment="Center" Width="250"/>
+                   HorizontalAlignment="Center" Width="250" Height="35"/>
         </StackPanel>
     </materialDesign:Card>
 </Window>

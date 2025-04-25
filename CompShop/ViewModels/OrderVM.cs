@@ -1,16 +1,17 @@
 ﻿using BLL.DTO;
 using ComputerShop.Commands;
 using ComputerShop.Models;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows;
 using System.Windows.Input;
+using System.Windows;
+using ComputerShop.Views;
 
 public class OrderVM : INotifyPropertyChanged
 {
     private readonly OrderModel _orderModel = new OrderModel();
+    private readonly CartModel _cartModel = new CartModel(); // добавить модель корзины
+
     private ObservableCollection<OrderDetailDto> _orderDetails;
     private string _deliveryAddress;
     private decimal _totalAmount;
@@ -51,11 +52,29 @@ public class OrderVM : INotifyPropertyChanged
 
     public event Action CloseWindowRequested;
 
-    public OrderVM(ObservableCollection<OrderDetailDto> items, int userId)
+    public OrderVM(int userId)
     {
-        OrderDetails = items;
+        LoadCartItemsAsOrderDetails(userId); // подгрузка из корзины
+
         ConfirmOrderCommand = new RelayCommand(_ => ConfirmOrder(userId));
         BackCommand = new RelayCommand(_ => CloseWindowRequested?.Invoke());
+    }
+
+    private void LoadCartItemsAsOrderDetails(int userId)
+    {
+        var cart = _cartModel.GetCartByUserId(userId);
+        if (cart != null)
+        {
+            var details = cart.Items.Select(item => new OrderDetailDto
+            {
+                ProductId = item.ProductId,
+                ProductName = item.ProductName,
+                Quantity = item.Quantity,
+                UnitPrice = (decimal)item.Price,
+            });
+
+            OrderDetails = new ObservableCollection<OrderDetailDto>(details);
+        }
     }
 
     private void ConfirmOrder(int userId)
@@ -82,9 +101,12 @@ public class OrderVM : INotifyPropertyChanged
 
         _orderModel.CreateOrder(order);
 
-        MessageBox.Show("Заказ успешно оформлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+        var successWindow = new OrderSuccess();
+        successWindow.Show();
+
         CloseWindowRequested?.Invoke();
     }
+
 
     private void RecalculateTotal()
     {
@@ -92,7 +114,6 @@ public class OrderVM : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-
     protected void OnPropertyChanged(string propertyName) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

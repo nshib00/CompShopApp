@@ -102,23 +102,24 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type local:ProductDto}">
-                        <materialDesign:Card Width="200" Height="300" Margin="8" UniformCornerRadius="8">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8">
-                                <Grid Height="100" Width="150">
-                                    <Image Source="{Binding ImagePath, Converter={StaticResource ImagePathConverter}}"
+                        <materialDesign:Card Width="200" Height="300" Margin="8" UniformCornerRadius="8" Background="#f9f9f9">
+                            <DockPanel Margin="8">
+                                <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Center">
+                                    <Grid Height="100" Width="150">
+                                        <Image Source="{Binding ImagePath, Converter={StaticResource ImagePathConverter}}"
                                            Width="150" Height="100"
                                            Stretch="UniformToFill"
                                            ImageFailed="Image_ImageFailed"/>
-                                </Grid>
+                                                        </Grid>
 
-                                <TextBlock Text="{Binding Name}"
+                                                        <TextBlock Text="{Binding Name}"
                                            FontWeight="Bold"
                                            FontSize="14"
                                            TextAlignment="Center"
                                            TextWrapping="Wrap"
                                            Margin="0,8,0,0"/>
 
-                                <TextBlock Text="{Binding Description}"
+                                                        <TextBlock Text="{Binding Description}"
                                            FontSize="12"
                                            Foreground="Gray"
                                            TextWrapping="Wrap"
@@ -126,22 +127,26 @@
                                            MaxHeight="40"
                                            TextAlignment="Center"/>
 
-                                <TextBlock Text="{Binding CategoryName}"
+                                                        <TextBlock Text="{Binding CategoryName}"
                                            FontSize="12"
                                            Foreground="#777"
                                            TextAlignment="Center"/>
 
-                                <TextBlock Text="{Binding Price, StringFormat='Цена: {0} ₽'}"
+                                                        <TextBlock Text="{Binding Price, StringFormat='Цена: {0} ₽'}"
                                            FontWeight="SemiBold"
                                            Margin="0,4,0,4"
                                            TextAlignment="Center"/>
+                                                    </StackPanel>
 
-                                <Button Content="Добавить в корзину"
-                                        Style="{StaticResource MaterialDesignOutlinedButton}"
-                                        Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Margin="0,8,0,0"/>
-                            </StackPanel>
+                                                    <Button Content="Добавить в корзину"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,5,0,0"
+                                    VerticalAlignment="Bottom"
+                                    HorizontalContentAlignment="Center"/>
+                                                </DockPanel>
                         </materialDesign:Card>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

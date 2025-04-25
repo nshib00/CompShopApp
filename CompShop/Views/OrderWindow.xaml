@@ -29,7 +29,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Товар" Binding="{Binding ProductName}" Width="*" />
                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="100" />
-                <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice}" Width="120" />
+                <DataGridTextColumn Header="Цена за 1 шт." Binding="{Binding UnitPrice}" Width="120" />
                 <DataGridTextColumn Header="Итого" Binding="{Binding TotalPrice}" Width="120" />
             </DataGrid.Columns>
         </DataGrid>
@@ -40,7 +40,7 @@
         </StackPanel>
 
         <TextBlock Grid.Row="3"
-                   Text="{Binding TotalAmount, StringFormat='Итоговая сумма: {0:C}'}"
+                   Text="{Binding TotalAmount, StringFormat='{}{0} ₽'}"
                    FontSize="16"
                    FontWeight="Bold"
                    HorizontalAlignment="Right"
@@ -50,7 +50,7 @@
             <Button Content="Назад" Command="{Binding BackCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}"
                     Width="100" Margin="0,0,10,0"/>
-            <Button Content="Оформить заказ" Command="{Binding ConfirmOrderCommand}"
+            <Button Content="Подтвердить" Command="{Binding ConfirmOrderCommand}"
                     Style="{StaticResource MaterialDesignRaisedButton}"
                     Width="150"/>
         </StackPanel>
