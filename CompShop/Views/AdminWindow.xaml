@@ -20,7 +20,7 @@
         </materialDesign:ColorZone>
 
         <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignTabControl}">
-            <TabItem Header="Список товары">
+            <TabItem Header="Список товаров">
                 <Frame x:Name="ProductFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
             <TabItem Header="Список категорий">

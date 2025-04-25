@@ -108,6 +108,7 @@ public class OrderVM : INotifyPropertyChanged
     }
 
 
+
     private void RecalculateTotal()
     {
         TotalAmount = OrderDetails?.Sum(x => x.TotalPrice) ?? 0;

@@ -14,8 +14,8 @@ namespace ComputerShop.Models
             var order = new Order
             {
                 CustomerId = dto.CustomerId,
-                OrderDate = DateTime.Now,
-                StatusId = 1, // например: "Ожидает подтверждения"
+                OrderDate = DateTime.UtcNow,
+                StatusId = 1,
                 DeliveryCost = dto.DeliveryCost,
                 OrderDetails = dto.Items.Select(item => new OrderDetail
                 {
@@ -32,6 +32,7 @@ namespace ComputerShop.Models
             _context.Orders.Add(order);
             _context.SaveChanges();
         }
+
 
         public List<OrderDto> GetOrdersByCustomer(int customerId)
         {
