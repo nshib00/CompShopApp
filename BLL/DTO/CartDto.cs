@@ -16,4 +16,5 @@ public class CartDto
         CustomerId = cart.CustomerId;
         Items = cart.Items?.Select(p => new CartItemDto(p)).ToList();
     }
+
 }

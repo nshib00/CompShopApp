@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\projects\CompShop\CompShop\App.xaml
-19-1413471902
+20-1240645619
 
-43-354882801
+50-2019966127
 218-341243374
-MainWindow.xaml;Views\AddCategoryWindow.xaml;Views\AddManufacturerWindow.xaml;Views\AddProductWindow.xaml;Views\AdminWindow.xaml;Views\Admin\CategoryPage.xaml;Views\Admin\ManufacturerPage.xaml;Views\Admin\OrderPage.xaml;Views\Admin\ProductPage.xaml;Views\CartWindow.xaml;Views\CategoriesList.xaml;Views\CategoryDetailsWindow.xaml;Views\CreateOrder.xaml;Views\CustomerWindow.xaml;Views\EditCategoryWindow.xaml;Views\EditManufacturerWindow.xaml;Views\EditProductWindow.xaml;Views\OrderSuccess.xaml;Views\RegistrationWindow.xaml;
+MainWindow.xaml;Views\AddCategoryWindow.xaml;Views\AddManufacturerWindow.xaml;Views\AddProductWindow.xaml;Views\AdminWindow.xaml;Views\Admin\CategoryPage.xaml;Views\Admin\ManufacturerPage.xaml;Views\Admin\ProductPage.xaml;Views\Admin\ReportPage.xaml;Views\CartWindow.xaml;Views\CategoriesList.xaml;Views\CategoryDetailsWindow.xaml;Views\CreateOrder.xaml;Views\CustomerWindow.xaml;Views\EditCategoryWindow.xaml;Views\EditManufacturerWindow.xaml;Views\EditProductWindow.xaml;Views\OrderSuccess.xaml;Views\OrderWindow.xaml;Views\RegistrationWindow.xaml;
 
 True
 

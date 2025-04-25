@@ -12,6 +12,7 @@
 
     <Window.Resources>
         <conv:ImagePathConverter x:Key="ImagePathConverter"/>
+        <conv:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
     </Window.Resources>
 
     <Grid Margin="8">
@@ -20,15 +21,27 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 8">
-            <TextBlock Text="CompShop" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0" />
+        <!-- Верхняя панель с поиском и корзиной -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 8" HorizontalAlignment="Stretch">
+            <!-- Левая часть -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBlock Text="CompShop" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0" />
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0, 0, 16, 0">
-                <TextBox Width="250" Margin="0,0,16,0"
+                <TextBox Width="250"
                          materialDesign:HintAssist.Hint="Поиск по товарам"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Name="SearchTextBox"
-                         Text="{Binding SearchText}"/>
+                         Text="{Binding SearchText}" 
+                         VerticalAlignment="Center"/>
+
+                <Button Content="🔍"
+                        Width="50"
+                        Height="50"
+                        Margin="8,0,0,0"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Command="{Binding SearchCommand}" 
+                        VerticalAlignment="Center"/>
+
                 <ComboBox Width="200" 
                           materialDesign:HintAssist.Hint="Выберите категорию"
                           Name="CategoryComboBox"
@@ -39,12 +52,46 @@
                           ItemsSource="{Binding Categories}"/>
             </StackPanel>
 
-            <Button Content="Выйти" Width="80"
-                    Command="{Binding LogoutCommand}"
-                    Style="{StaticResource MaterialDesignFlatButton}" 
-                    HorizontalAlignment="Right"/>
+            <!-- Правая часть (информация о пользователе и корзине) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0">
+                <!-- Имя пользователя -->
+                <TextBlock Text="{Binding UserName}"
+                   FontSize="14"
+                   FontWeight="SemiBold"
+                   VerticalAlignment="Center"
+                   Margin="250,0,16,0"/>
+
+                <!-- Кнопка корзины -->
+                <Grid Visibility="{Binding CartItemCount, Converter={StaticResource IntToVisibilityConverter}}">
+                    <Button Content="🛒"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Width="50" Height="50"
+                        Margin="50,0,8,0"
+                        Command="{Binding OpenCartCommand}"/>
+
+                    <!-- Счётчик -->
+                    <Border Background="Red"
+                            CornerRadius="8"
+                            Width="16" Height="16"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="100,2,2,0">
+                        <TextBlock Text="{Binding CartItemCount}" 
+                                   FontSize="10" 
+                                   Foreground="White" 
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Кнопка выхода -->
+                <Button Content="Выйти" Width="80"
+                        Command="{Binding LogoutCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"/>
+            </StackPanel>
         </StackPanel>
 
+        <!-- Список товаров -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl Name="ProductsItemsControl" ItemsSource="{Binding Products}">
                 <ItemsControl.ItemsPanel>
@@ -58,9 +105,10 @@
                         <materialDesign:Card Width="200" Height="300" Margin="8" UniformCornerRadius="8">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8">
                                 <Grid Height="100" Width="150">
-                                    <Image Source="{Binding ImagePath}"
-                                       Stretch="UniformToFill"
-                                       ImageFailed="Image_ImageFailed"/>
+                                    <Image Source="{Binding ImagePath, Converter={StaticResource ImagePathConverter}}"
+                                           Width="150" Height="100"
+                                           Stretch="UniformToFill"
+                                           ImageFailed="Image_ImageFailed"/>
                                 </Grid>
 
                                 <TextBlock Text="{Binding Name}"
@@ -88,9 +136,9 @@
                                            Margin="0,4,0,4"
                                            TextAlignment="Center"/>
 
-                                <Button Content="Купить"
+                                <Button Content="Добавить в корзину"
                                         Style="{StaticResource MaterialDesignOutlinedButton}"
-                                        Command="{Binding DataContext.BuyProductCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
                                         Margin="0,8,0,0"/>
                             </StackPanel>

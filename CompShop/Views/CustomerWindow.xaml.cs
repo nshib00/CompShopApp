@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using BLL.DTO;
 using CompShop.ViewModels;
 
@@ -9,10 +10,10 @@ namespace ComputerShop.Views
     {
         private readonly CustomerVM _viewModel;
 
-        public CustomerWindow()
+        public CustomerWindow(CustomerVM viewModel)
         {
             InitializeComponent();
-            _viewModel = new CustomerVM();
+            _viewModel = viewModel;
             this.DataContext = _viewModel;
 
             // Подключение обработчиков событий

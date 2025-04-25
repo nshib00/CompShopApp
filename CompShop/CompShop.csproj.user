@@ -8,7 +8,7 @@
     <Compile Update="Views\Admin\ManufacturerPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Admin\OrderPage.xaml.cs">
+    <Compile Update="Views\Admin\ReportPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\CategoriesList.xaml.cs">
@@ -27,6 +27,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\EditProductWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\OrderWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

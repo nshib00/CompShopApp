@@ -26,7 +26,10 @@ namespace ComputerShop.Views
             if (user.IsAdmin)
                 nextWindow = new AdminWindow();
             else
-                nextWindow = new CustomerWindow();
+            {
+                var vm = new CustomerVM(user);
+                nextWindow = new CustomerWindow(vm);
+            }
 
             nextWindow.Show();
             this.Close();

@@ -1,124 +1,220 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Input;
-using BLL.DTO;
+﻿using BLL.DTO;
 using BLL.Model;
 using ComputerShop.Commands;
 using ComputerShop.Models;
+using ComputerShop.ViewModels;
+using ComputerShop.Views;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
 
-namespace CompShop.ViewModels
+public class CustomerVM : INotifyPropertyChanged
 {
-    public class CustomerVM : INotifyPropertyChanged
+    private readonly ProductModel _productModel;
+    private readonly CategoryModel _categoryModel;
+    private readonly CartModel _cartModel; // Для работы с корзиной
+    private ObservableCollection<ProductDto> _products;
+    private ObservableCollection<CategoryDto> _categories;
+    private CategoryDto _selectedCategory;
+    private string _searchText;
+    private UserDto? _currentUser;
+
+    // Свойства для отображения информации в UI
+    private int _cartItemCount;
+    public int CartItemCount
     {
-        private readonly ProductModel _productModel;
-        private readonly CategoryModel _categoryModel;
-        private ObservableCollection<ProductDto> _products;
-        private ObservableCollection<CategoryDto> _categories;
-        private CategoryDto _selectedCategory;
-        private string _searchText;
-
-        public ICommand LogoutCommand { get; }
-        public ICommand BuyProductCommand { get; }
-
-        public CustomerVM()
+        get => _cartItemCount;
+        set
         {
-            _productModel = new ProductModel();
-            _categoryModel = new CategoryModel();
-
-            LogoutCommand = new RelayCommand(Logout);
-            BuyProductCommand = new RelayCommand(BuyProduct);
-
-            LoadCategories();
-            LoadProducts();
-        }
-
-        public ObservableCollection<ProductDto> Products
-        {
-            get => _products;
-            set
+            if (_cartItemCount != value)
             {
-                if (_products != value)
-                {
-                    _products = value;
-                    OnPropertyChanged(nameof(Products));
-                }
+                _cartItemCount = value;
+                OnPropertyChanged(nameof(CartItemCount));  // Уведомление об изменении
             }
         }
+    }
 
-        public ObservableCollection<CategoryDto> Categories
+    public string UserName => _currentUser.FirstName; // Предположим, что имя хранится в FirstName
+
+    public ICommand LogoutCommand { get; }
+    public ICommand AddToCartCommand { get; }
+    public ICommand SearchCommand { get; }
+    public ICommand OpenCartCommand { get; }
+
+    public CustomerVM(UserDto user)
+    {
+        _currentUser = user;
+        _productModel = new ProductModel();
+        _categoryModel = new CategoryModel();
+        _cartModel = new CartModel();
+
+        LogoutCommand = new RelayCommand(Logout);
+        AddToCartCommand = new RelayCommand(AddToCart);
+        SearchCommand = new RelayCommand(ExecuteSearch);
+        OpenCartCommand = new RelayCommand(OpenCart);
+
+        LoadCategories();
+        LoadProducts();
+        UpdateCartItemCount(); // Обновление количества товаров в корзине
+    }
+
+    public ObservableCollection<ProductDto> Products
+    {
+        get => _products;
+        set
         {
-            get => _categories;
-            set
+            if (_products != value)
             {
-                if (_categories != value)
-                {
-                    _categories = value;
-                    OnPropertyChanged(nameof(Categories));
-                }
+                _products = value;
+                OnPropertyChanged(nameof(Products));
             }
         }
+    }
 
-        public CategoryDto SelectedCategory
+    public ObservableCollection<CategoryDto> Categories
+    {
+        get => _categories;
+        set
         {
-            get => _selectedCategory;
-            set
+            if (_categories != value)
             {
-                if (_selectedCategory != value)
-                {
-                    _selectedCategory = value;
-                    OnPropertyChanged(nameof(SelectedCategory));
-                    LoadProducts();  // Загружаем товары при изменении категории
-                }
+                _categories = value;
+                OnPropertyChanged(nameof(Categories));
             }
         }
+    }
 
-        public string SearchText
+    public CategoryDto SelectedCategory
+    {
+        get => _selectedCategory;
+        set
         {
-            get => _searchText;
-            set
+            if (_selectedCategory != value)
             {
-                if (_searchText != value)
-                {
-                    _searchText = value;
-                    OnPropertyChanged(nameof(SearchText));
-                    LoadProducts();  // Загружаем товары при изменении текста поиска
-                }
+                _selectedCategory = value;
+                OnPropertyChanged(nameof(SelectedCategory));
+                LoadProducts();  // Загружаем товары при изменении категории
             }
         }
+    }
 
-        public void LoadCategories()
+    public string SearchText
+    {
+        get => _searchText;
+        set
         {
-            Categories = new ObservableCollection<CategoryDto>(_categoryModel.GetAllCategories());
-        }
-
-        public void LoadProducts()
-        {
-            if (SelectedCategory == null && string.IsNullOrEmpty(SearchText))
+            if (_searchText != value)
             {
-                Products = new ObservableCollection<ProductDto>(_productModel.GetAllProducts());
-            }
-            else
-            {
-                Products = new ObservableCollection<ProductDto>(_productModel.GetProductsBySearch(SearchText, SelectedCategory?.Id));
+                _searchText = value;
+                OnPropertyChanged(nameof(SearchText));
+                LoadProducts();  // Загружаем товары при изменении текста поиска
             }
         }
+    }
 
-        public void Logout(object parameter)
+    public void LoadCategories()
+    {
+        var allCategories = new CategoryDto
         {
-            // Логика выхода
+            Id = 0,
+            Name = "Все категории"
+        };
+
+        var categoriesWithAll = new ObservableCollection<CategoryDto> { allCategories };
+
+        foreach (var cat in _categoryModel.GetAllCategories())
+            categoriesWithAll.Add(cat);
+
+        Categories = categoriesWithAll;
+    }
+
+    public void LoadProducts()
+    {
+        if (SelectedCategory == null && string.IsNullOrEmpty(SearchText))
+        {
+            Products = new ObservableCollection<ProductDto>(_productModel.GetAllProducts());
+        }
+        else
+        {
+            Products = new ObservableCollection<ProductDto>(_productModel.GetProductsBySearch(SearchText, SelectedCategory?.Id));
+        }
+    }
+
+    private void UpdateCartItemCount()
+    {
+        // Получаем корзину для текущего пользователя
+        var cart = _cartModel.GetCartByUserId(_currentUser.Id);
+
+        // Если корзина существует, то рассчитываем сумму всех количеств товаров
+        if (cart?.Items != null)
+        {
+            CartItemCount = cart.Items.Sum(item => item.Quantity); // Суммируем все значения Quantity
+        }
+        else
+        {
+            CartItemCount = 0; // Если корзина пуста, устанавливаем 0
         }
 
-        public void BuyProduct(object parameter)
+        // Уведомление об изменении значения
+        OnPropertyChanged(nameof(CartItemCount));
+    }
+
+
+    private void OpenCart(object parameter)
+    {
+        var cartViewModel = new CartVM(_currentUser.Id);
+        var cartWindow = new CartWindow(cartViewModel);
+        cartWindow.ShowDialog();
+    }
+
+    public void Logout(object parameter)
+    {
+        // Очистка текущего пользователя
+        _currentUser = null;
+
+        // Логика для закрытия текущего окна (если нужно)
+        Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is CartWindow)?.Close();  // Закрыть корзину, если она открыта
+
+        // Возвращаем на экран входа (MainWindow)
+        var loginWindow = new MainWindow();
+        loginWindow.Show();
+
+        // Закрываем текущее окно (предполагается, что оно было открыто после логина)
+        var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Window);
+        currentWindow?.Close();
+    }
+
+    public void AddToCart(object parameter)
+    {
+        var product = parameter as ProductDto;
+
+        if (product == null) return;
+
+        // Получаем текущую корзину для пользователя (если она существует)
+        var cartId = _cartModel.GetCartByUserId(_currentUser.Id)?.Id;
+        if (cartId == null)
         {
-            var product = parameter as ProductDto;
-            // Логика покупки товара
+            // Если корзина не найдена, создаем новую
+            cartId = _cartModel.CreateCart(_currentUser.Id);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        // Добавляем товар в корзину
+        _cartModel.AddProductToCart(cartId.Value, product, 1); // Добавляем товар с количеством 1
 
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        // Обновляем количество товаров в корзине
+        UpdateCartItemCount();
+    }
+
+    private void ExecuteSearch(object parameter)
+    {
+        // Логика поиска
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

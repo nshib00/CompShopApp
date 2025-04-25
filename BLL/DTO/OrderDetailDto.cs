@@ -4,7 +4,6 @@ namespace BLL.DTO
 {
     public class OrderDetailDto
     {
-        public int Id { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public int Quantity { get; set; }
@@ -13,13 +12,12 @@ namespace BLL.DTO
 
         public OrderDetailDto() { }
 
-        public OrderDetailDto(OrderDetail orderDetail)
+        public OrderDetailDto(OrderDetail detail)
         {
-            Id = orderDetail.Id;
-            ProductId = orderDetail.ProductId;
-            ProductName = orderDetail.Product?.Name;
-            Quantity = orderDetail.Quantity;
-            UnitPrice = orderDetail.UnitPrice;
+            ProductId = detail.ProductId;
+            ProductName = detail.Product?.Name;
+            Quantity = detail.Quantity;
+            UnitPrice = detail.UnitPrice;
         }
     }
 }

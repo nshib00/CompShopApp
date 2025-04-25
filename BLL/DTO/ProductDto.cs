@@ -15,6 +15,7 @@ namespace BLL.DTO
         public string Description { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
+        public string? ImagePath { get; set; }
 
         public int StockQuantity { get; set; }
 
@@ -30,6 +31,7 @@ namespace BLL.DTO
             CategoryId = product.CategoryId;
             CategoryName = product.Category?.Name;
             StockQuantity = product.StockQuantity;
+            ImagePath = product.ImagePath;
         }
     }
 

@@ -6,14 +6,25 @@
       Title="ProductPage">
 
     <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Для кнопки -->
+            <RowDefinition Height="*"/>
+            <!-- Для таблицы -->
+        </Grid.RowDefinitions>
+
+        <!-- Кнопка в первой строке -->
         <Button Content="Добавить товар"
                 Command="{Binding AddProductCommand}"
                 Style="{StaticResource MaterialDesignFlatButton}"
                 Margin="0 0 0 10"
-                Height="Auto"/>
+                Height="35"
+                Grid.Row="0"/>
 
-        <!-- Обернем только DataGrid в ScrollViewer -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <!-- DataGrid в ScrollViewer во второй строке -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto"
+                      Grid.Row="1">
             <DataGrid ItemsSource="{Binding Products}"
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                       AutoGenerateColumns="False"

@@ -23,6 +23,16 @@ namespace ComputerShop.Models
             return cart.Id;
         }
 
+        public CartDto? GetCartByUserId(int customerId)
+        {
+            var cart = _context.Carts
+                .Include(c => c.Items) // Включаем коллекцию элементов корзины
+                    .ThenInclude(ci => ci.Product) // Включаем связанные товары в каждом элементе корзины
+                .FirstOrDefault(c => c.CustomerId == customerId);
+
+            return cart != null ? new CartDto(cart) : null;
+        }
+
         public void AddProductToCart(int cartId, ProductDto productDto, int quantity)
         {
             var cart = _context.Carts
@@ -66,6 +76,23 @@ namespace ComputerShop.Models
                 _context.SaveChanges();
             }
         }
+
+        public void DecreaseProductQuantity(int cartId, int productId, int decreaseBy)
+        {
+            var cartItem = _context.CartItems
+                .FirstOrDefault(ci => ci.CartId == cartId && ci.ProductId == productId);
+
+            if (cartItem != null)
+            {
+                cartItem.Quantity -= decreaseBy;
+
+                if (cartItem.Quantity <= 0)
+                    return;
+
+                _context.SaveChanges();
+            }
+        }
+
 
         public void RemoveProductFromCart(int cartId, int productId)
         {

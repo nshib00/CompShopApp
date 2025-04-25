@@ -20,17 +20,17 @@
         </materialDesign:ColorZone>
 
         <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignTabControl}">
-            <TabItem Header="Товары">
+            <TabItem Header="Список товары">
                 <Frame x:Name="ProductFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
-            <TabItem Header="Категории">
+            <TabItem Header="Список категорий">
                 <Frame x:Name="CategoryFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
-            <TabItem Header="Заказы">
-                <Frame x:Name="OrderFrame" NavigationUIVisibility="Hidden"/>
-            </TabItem>
-            <TabItem Header="Производители">
+            <TabItem Header="Список производителей">
                 <Frame x:Name="ManufacturerFrame" NavigationUIVisibility="Hidden"/>
+            </TabItem>
+            <TabItem Header="Отчеты">
+                <Frame x:Name="ReportFrame" NavigationUIVisibility="Hidden"/>
             </TabItem>
         </TabControl>
     </Grid>

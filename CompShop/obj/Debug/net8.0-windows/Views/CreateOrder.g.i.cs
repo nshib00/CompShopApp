@@ -55,7 +55,7 @@ namespace ComputerShop.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/CompShop;component/views/createorder.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CompShop;V1.0.0.0;component/views/createorder.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\CreateOrder.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
