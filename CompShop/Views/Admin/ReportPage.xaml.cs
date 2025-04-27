@@ -1,27 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using CompShop.ViewModels;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace CompShop.Views.Admin
+namespace CompShop.Views.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для ReportPage.xaml
-    /// </summary>
-    public partial class ReportPage : Window
+    public partial class ReportPage : Page
     {
         public ReportPage()
         {
             InitializeComponent();
+            DataContext = new ReportVM();
+        }
+
+        private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            switch (e.Column.Header.ToString())
+            {
+                case "OrderNumber":
+                    e.Column.Header = "Номер заказа";
+                    break;
+                case "OrderDate":
+                    e.Column.Header = "Дата заказа";
+                    break;
+                case "Status":
+                    e.Column.Header = "Статус";
+                    break;
+                case "OrderAmount":
+                    e.Column.Header = "Сумма заказа";
+                    break;
+                case "Category":
+                    e.Column.Header = "Категория";
+                    break;
+                case "SoldQuantity":
+                    e.Column.Header = "Количество проданных товаров";
+                    break;
+                case "TotalAmount":
+                    e.Column.Header = "Общая сумма";
+                    break;
+                case "Product":
+                    e.Column.Header = "Продукт";
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

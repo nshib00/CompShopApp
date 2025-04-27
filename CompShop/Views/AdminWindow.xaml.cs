@@ -1,4 +1,5 @@
-﻿using CompShop.Views.Pages;
+﻿using CompShop.Views.Admin;
+using CompShop.Views.Pages;
 using System.Windows;
 
 namespace ComputerShop.Views
@@ -11,8 +12,8 @@ namespace ComputerShop.Views
 
             ProductFrame.NavigationService.Navigate(new ProductPage());
             CategoryFrame.NavigationService.Navigate(new CategoryPage());
-            //OrderFrame.NavigationService.Navigate(new OrderPage());
             ManufacturerFrame.NavigationService.Navigate(new ManufacturerPage());
+            ReportFrame.NavigationService.Navigate(new ReportPage());
         }
     }
 }

@@ -12,13 +12,15 @@ namespace BLL.DTO
         {
             get => Quantity * UnitPrice;
         }
+        public Product? Product { get; set; }
 
         public OrderDetailDto() { }
 
         public OrderDetailDto(OrderDetail detail)
         {
             ProductId = detail.ProductId;
-            ProductName = detail.Product?.Name;
+            Product = detail.Product;
+            ProductName = detail.Product.Name;
             Quantity = detail.Quantity;
             UnitPrice = detail.UnitPrice;
         }

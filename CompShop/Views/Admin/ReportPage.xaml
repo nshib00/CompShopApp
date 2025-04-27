@@ -1,12 +1,56 @@
-﻿<Window x:Class="CompShop.Views.Admin.ReportPage"
+﻿<Page x:Class="CompShop.Views.Pages.ReportPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CompShop.Views.Admin"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="ReportPage" Height="450" Width="800">
-    <Grid>
-        
+        Title="Отчеты по продажам">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
+            <Button Content="Общие продажи"
+                    Width="200" Height="50"
+                    Command="{Binding GenerateTotalOrdersReportCommand}"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="0 0 15 0"/>
+
+            <Button Content="Продажи по категориям"
+                    Width="200" Height="50"
+                    Command="{Binding GenerateCategoryOrdersReportCommand}"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="0 0 15 0"/>
+
+            <Button Content="Топ продажи"
+                    Width="200" Height="50"
+                    Command="{Binding GenerateTopProductsReportCommand}"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="0 0 15 0"/>
+        </StackPanel>
+
+        <!-- DataGrid для отображения данных отчета -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding ReportData}"
+                  AutoGenerateColumns="True"
+                  CanUserAddRows="False"
+                  Margin="0 10 0 10"
+                  Style="{StaticResource MaterialDesignDataGrid}"
+                  IsReadOnly="True"
+                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
+
+        <Button Grid.Row="2"
+                Content="Экспортировать отчет в PDF"
+                Height="50"
+                Width="300"
+                HorizontalAlignment="Center"
+                Command="{Binding ExportReportToPdfCommand}"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Margin="0 20 0 0"/>
     </Grid>
-</Window>
+</Page>

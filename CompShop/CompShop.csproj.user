@@ -11,6 +11,15 @@
     <Compile Update="Views\Admin\ReportPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\Admin\Reports\CategoryOrdersForm.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Admin\Reports\TopProductsForm.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Admin\Reports\TotalOrdersForm.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\CategoriesList.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
