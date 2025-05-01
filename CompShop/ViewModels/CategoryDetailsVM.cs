@@ -1,6 +1,6 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -9,15 +9,15 @@ namespace CompShop.ViewModels
 {
     public class CategoryDetailsVM : INotifyPropertyChanged
     {
-        private readonly CategoryModel _categoryModel;
+        private readonly ICategoryService _categoryService;
         private CategoryWithHierarchyDto _category;
 
         public event Action OnBackRequested;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public CategoryDetailsVM(CategoryModel categoryModel, int categoryId)
+        public CategoryDetailsVM(ICategoryService categoryService, int categoryId)
         {
-            _categoryModel = categoryModel;
+            _categoryService = categoryService;
             CategoryId = categoryId;
             LoadCategoryDetails();
 
@@ -40,7 +40,7 @@ namespace CompShop.ViewModels
 
         private void LoadCategoryDetails()
         {
-            Category = _categoryModel.GetCategoryWithHierarchy(CategoryId);
+            Category = _categoryService.GetCategoryWithHierarchy(CategoryId);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

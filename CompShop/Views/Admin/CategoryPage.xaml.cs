@@ -1,6 +1,7 @@
 ﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using CompShop.ViewModels;
-using ComputerShop.Models;
 using ComputerShop.Views;
 using DAL.Context;
 using System.Collections.ObjectModel;
@@ -12,11 +13,11 @@ namespace CompShop.Views.Pages
     public partial class CategoryPage : Page
     {
         private List<CategoryDto> _categories;
-        private readonly CategoryModel _categoryModel;
+        private readonly ICategoryService _categoryService;
 
         public CategoryPage()
         {
-            _categoryModel = new CategoryModel();
+            _categoryService = new CategoryService();
             InitializeComponent();
             LoadCategories();
         }
@@ -42,7 +43,7 @@ namespace CompShop.Views.Pages
                 .Select(c => new CategoryShortDto(c))
                 .ToList();
 
-            var addVM = new AddCategoryVM(_categoryModel);
+            var addVM = new AddCategoryVM(_categoryService);
             addVM.SetCategories(new ObservableCollection<CategoryShortDto>(categories));
             addVM.OnCategoryAdded += LoadCategories;
 
@@ -68,7 +69,7 @@ namespace CompShop.Views.Pages
                         .Select(c => new CategoryShortDto(c))
                         .ToList();
 
-                    var editVM = new EditCategoryVM(_categoryModel, category.Id);
+                    var editVM = new EditCategoryVM(_categoryService, category.Id);
                     editVM.SetCategories(new ObservableCollection<CategoryShortDto>(categoriesWithoutCurrent));
                     var editWindow = new EditCategoryWindow { DataContext = editVM };
                     editWindow.CloseAction = () => editWindow.Close();

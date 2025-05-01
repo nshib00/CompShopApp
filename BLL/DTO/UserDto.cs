@@ -1,5 +1,4 @@
-﻿using DAL;
-using DAL.Entities;
+﻿using DAL.Models;
 
 
 namespace BLL.DTO

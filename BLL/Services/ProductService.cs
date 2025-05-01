@@ -1,11 +1,12 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BLL.Model
+namespace BLL.Services
 {
-    public class ProductModel
+    public class ProductService : IProductService
     {
         private readonly AppDbContext _context = new AppDbContext();
 
@@ -94,21 +95,18 @@ namespace BLL.Model
                 .Include(p => p.Category)
                 .AsQueryable();
 
-            // Если указан текст поиска, добавляем фильтрацию по имени и описанию
             if (!string.IsNullOrEmpty(searchText))
             {
                 query = query.Where(p => p.Name.Contains(searchText) || p.Description.Contains(searchText));
             }
 
-            // Если указана категория, добавляем фильтрацию по категории
             if (categoryId.HasValue)
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
             }
 
-            // Преобразуем в список и возвращаем результат
             return query
-                .Select(p => new ProductDto(p)) // Преобразуем сущности в ProductDto
+                .Select(p => new ProductDto(p))
                 .ToList();
         }
     }

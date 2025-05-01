@@ -1,11 +1,12 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ComputerShop.Models
+namespace BLL.Services
 {
-    public class CartModel
+    public class CartService : ICartService
     {
         private readonly AppDbContext _context = new AppDbContext();
 
@@ -120,7 +121,7 @@ namespace ComputerShop.Models
             }
         }
 
-        public CartDto GetCartById(int id)
+        public CartDto? GetCartById(int id)
         {
             var cart = _context.Carts
                 .Include(c => c.Items.Select(p => p.Product))

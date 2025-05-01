@@ -1,11 +1,12 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ComputerShop.Models
+namespace BLL.Services
 {
-    public class OrderModel
+    public class OrderService : IOrderService
     {
         private readonly AppDbContext _context = new AppDbContext();
 

@@ -1,7 +1,7 @@
 ﻿using BLL.DTO;
-using BLL.Model;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,9 +10,9 @@ using System.Windows.Input;
 
 public class CustomerVM : INotifyPropertyChanged
 {
-    private readonly ProductModel _productModel;
-    private readonly CategoryModel _categoryModel;
-    private readonly CartModel _cartModel;
+    private readonly IProductService _productService;
+    private readonly ICategoryService _categoryService;
+    private readonly ICartService _cartService;
     private ObservableCollection<ProductDto> _products;
     private ObservableCollection<CategoryDto> _categories;
     private CategoryDto _selectedCategory;
@@ -45,9 +45,9 @@ public class CustomerVM : INotifyPropertyChanged
     public CustomerVM(UserDto user)
     {
         _currentUser = user;
-        _productModel = new ProductModel();
-        _categoryModel = new CategoryModel();
-        _cartModel = new CartModel();
+        _productService = new ProductService();
+        _categoryService = new CategoryService();
+        _cartService = new CartService();
 
         LogoutCommand = new RelayCommand(Logout);
         AddToCartCommand = new RelayCommand(AddToCart);
@@ -120,7 +120,7 @@ public class CustomerVM : INotifyPropertyChanged
         var allCategories = new CategoryDto { Id = 0, Name = "Все категории" };
         var categoriesWithAll = new ObservableCollection<CategoryDto> { allCategories };
 
-        foreach (var cat in _categoryModel.GetAllCategories())
+        foreach (var cat in _categoryService.GetCategoriesWithData())
             categoriesWithAll.Add(cat);
 
         Categories = categoriesWithAll;
@@ -130,17 +130,17 @@ public class CustomerVM : INotifyPropertyChanged
     {
         if (SelectedCategory == null && string.IsNullOrEmpty(SearchText))
         {
-            Products = new ObservableCollection<ProductDto>(_productModel.GetAllProducts());
+            Products = new ObservableCollection<ProductDto>(_productService.GetAllProducts());
         }
         else
         {
-            Products = new ObservableCollection<ProductDto>(_productModel.GetProductsBySearch(SearchText, SelectedCategory?.Id));
+            Products = new ObservableCollection<ProductDto>(_productService.GetProductsBySearch(SearchText, SelectedCategory?.Id));
         }
     }
 
     private void UpdateCartItemCount()
     {
-        var cart = _cartModel.GetCartByUserId(_currentUser.Id);
+        var cart = _cartService.GetCartByUserId(_currentUser.Id);
         CartItemCount = cart?.Items.Sum(item => item.Quantity) ?? 0;
         OnPropertyChanged(nameof(CartItemCount));
     }
@@ -171,8 +171,8 @@ public class CustomerVM : INotifyPropertyChanged
         var product = parameter as ProductDto;
         if (product == null) return;
 
-        var cartId = _cartModel.GetCartByUserId(_currentUser.Id)?.Id ?? _cartModel.CreateCart(_currentUser.Id);
-        _cartModel.AddProductToCart(cartId, product, 1);
+        var cartId = _cartService.GetCartByUserId(_currentUser.Id)?.Id ?? _cartService.CreateCart(_currentUser.Id);
+        _cartService.AddProductToCart(cartId, product, 1);
 
         UpdateCartItemCount();
     }

@@ -1,5 +1,6 @@
-﻿using ComputerShop.Commands;
-using ComputerShop.Models;
+﻿using BLL.Services;
+using BLL.Services.Interfaces;
+using ComputerShop.Commands;
 using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 
 public class CartVM : INotifyPropertyChanged
 {
-    private readonly CartModel _cartModel;
+    private readonly ICartService _cartService;
     private ObservableCollection<CartItemDto> _cartItems;
     private double _totalCartPrice;
     private int _currentUserId;
@@ -59,7 +60,7 @@ public class CartVM : INotifyPropertyChanged
     public CartVM(int userId)
     {
         _currentUserId = userId;
-        _cartModel = new CartModel();
+        _cartService = new CartService();
         LoadCart();
 
         ContinueShoppingCommand = new RelayCommand(ContinueShopping);
@@ -68,7 +69,7 @@ public class CartVM : INotifyPropertyChanged
 
     public void LoadCart()
     {
-        var cart = _cartModel.GetCartByUserId(_currentUserId);
+        var cart = _cartService.GetCartByUserId(_currentUserId);
 
         if (cart != null)
         {
@@ -90,9 +91,9 @@ public class CartVM : INotifyPropertyChanged
             item.IncreaseQuantityCommand = new RelayCommand(_ =>
             {
                 item.Quantity++;
-                var cart = _cartModel.GetCartByUserId(_currentUserId);
+                var cart = _cartService.GetCartByUserId(_currentUserId);
                 if (cart != null)
-                    _cartModel.IncreaseProductQuantity(cart.Id, item.ProductId, 1);
+                    _cartService.IncreaseProductQuantity(cart.Id, item.ProductId, 1);
             });
 
             item.DecreaseQuantityCommand = new RelayCommand(_ =>
@@ -100,15 +101,15 @@ public class CartVM : INotifyPropertyChanged
                 if (item.Quantity > 1)
                 {
                     item.Quantity--;
-                    var cart = _cartModel.GetCartByUserId(_currentUserId);
+                    var cart = _cartService.GetCartByUserId(_currentUserId);
                     if (cart != null)
-                        _cartModel.DecreaseProductQuantity(cart.Id, item.ProductId, 1);
+                        _cartService.DecreaseProductQuantity(cart.Id, item.ProductId, 1);
                 }
             });
 
             item.RemoveItemCommand = new RelayCommand(_ =>
             {
-                _cartModel.RemoveProductFromCart(_cartId, item.ProductId);
+                _cartService.RemoveProductFromCart(_cartId, item.ProductId);
                 CartItems.Remove(item);
                 RecalculateTotal();
             });
@@ -143,7 +144,7 @@ public class CartVM : INotifyPropertyChanged
                 newItem.IncreaseQuantityCommand = new RelayCommand(_ =>
                 {
                     newItem.Quantity++;
-                    _cartModel.IncreaseProductQuantity(_cartId, newItem.ProductId, 1);
+                    _cartService.IncreaseProductQuantity(_cartId, newItem.ProductId, 1);
                 });
 
                 newItem.DecreaseQuantityCommand = new RelayCommand(_ =>
@@ -151,13 +152,13 @@ public class CartVM : INotifyPropertyChanged
                     if (newItem.Quantity > 1)
                     {
                         newItem.Quantity--;
-                        _cartModel.DecreaseProductQuantity(_cartId, newItem.ProductId, 1);
+                        _cartService.DecreaseProductQuantity(_cartId, newItem.ProductId, 1);
                     }
                 });
 
                 newItem.RemoveItemCommand = new RelayCommand(_ =>
                 {
-                    _cartModel.RemoveProductFromCart(_cartId, newItem.ProductId);
+                    _cartService.RemoveProductFromCart(_cartId, newItem.ProductId);
                     CartItems.Remove(newItem);
                     RecalculateTotal();
                 });

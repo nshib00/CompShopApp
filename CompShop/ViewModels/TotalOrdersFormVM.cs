@@ -1,5 +1,6 @@
 ﻿using BLL.DTO;
-using CompShop.Models;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -7,7 +8,7 @@ namespace CompShop.ViewModels
 {
     public class TotalOrdersFormVM : INotifyPropertyChanged
     {
-        private readonly ReportModel _reportModel = new ReportModel();
+        private readonly IOrderStatusService _orderStatusService = new OrderStatusService();
 
         public ObservableCollection<OrderStatusDto> OrderStatuses { get; set; } = new ObservableCollection<OrderStatusDto>();
 
@@ -51,7 +52,7 @@ namespace CompShop.ViewModels
 
         private void LoadOrderStatuses()
         {
-            var statuses = _reportModel.GetOrderStatuses();
+            var statuses = _orderStatusService.GetOrderStatuses();
             foreach (var status in statuses)
             {
                 OrderStatuses.Add(status);

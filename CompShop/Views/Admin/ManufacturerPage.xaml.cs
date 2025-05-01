@@ -1,15 +1,13 @@
-﻿using BLL.DTO;
-using CompShop.ViewModels;
-using ComputerShop.Models;
+﻿using BLL.Services;
+using BLL.Services.Interfaces;
 using ComputerShop.ViewModels;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace CompShop.Views.Pages
 {
     public partial class ManufacturerPage : Page
     {
-        private readonly ManufacturerModel _manufacturerModel = new();
+        private readonly IManufacturerService _manufacturerModel = new ManufacturerService();
 
         public ManufacturerPage()
         {

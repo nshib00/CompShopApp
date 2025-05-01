@@ -1,11 +1,12 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ComputerShop.Models
+namespace BLL.Services
 {
-    public class CategoryModel
+    public class CategoryService : ICategoryService
     {
         private readonly AppDbContext _context = new AppDbContext();
 
@@ -33,7 +34,6 @@ namespace ComputerShop.Models
 
             if (category == null) return;
 
-            // Проверка на циклические ссылки
             if (dto.ParentCategoryId.HasValue &&
                 IsCircularReference(dto.Id, dto.ParentCategoryId.Value))
             {
@@ -54,13 +54,11 @@ namespace ComputerShop.Models
 
             if (category == null) return;
 
-            // Удаляем связи с продуктами
             foreach (var product in category.Products.ToList())
             {
                 product.CategoryId = null;
             }
 
-            // Переносим подкатегории на уровень выше
             foreach (var subCategory in category.SubCategories.ToList())
             {
                 subCategory.ParentCategoryId = category.ParentCategoryId;
@@ -70,7 +68,7 @@ namespace ComputerShop.Models
             _context.SaveChanges();
         }
 
-        public List<CategoryDto> GetAllCategories()
+        public List<CategoryDto> GetCategoriesWithData()
         {
             return _context.Categories
                 .Include(c => c.Products)
@@ -79,6 +77,12 @@ namespace ComputerShop.Models
                 .AsNoTracking()
                 .Select(c => new CategoryDto(c))
                 .ToList();
+        }
+
+        public List<CategoryDto> GetCategories()
+        {
+            var categories = _context.Categories.ToList();
+            return categories.Select(c => new CategoryDto(c)).ToList();
         }
 
         public CategoryWithHierarchyDto? GetCategoryWithHierarchy(int id)

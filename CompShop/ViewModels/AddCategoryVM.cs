@@ -1,15 +1,15 @@
 ﻿using BLL.DTO;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows;
+using BLL.Services.Interfaces;
 
 public class AddCategoryVM : INotifyPropertyChanged
 {
-    private readonly CategoryModel _categoryModel;
+    private readonly ICategoryService _categoryService;
     private string _name;
     private int? _parentCategoryId;
     private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
@@ -19,9 +19,9 @@ public class AddCategoryVM : INotifyPropertyChanged
 
     public Action CloseAction { get; set; }
 
-    public AddCategoryVM(CategoryModel categoryModel)
+    public AddCategoryVM(ICategoryService categoryService)
     {
-        _categoryModel = categoryModel;
+        _categoryService = categoryService;
         SaveCommand = new RelayCommand(_ => SaveCategory());
         CancelCommand = new RelayCommand(_ => Cancel());
     }
@@ -70,7 +70,7 @@ public class AddCategoryVM : INotifyPropertyChanged
                 ParentCategoryId = ParentCategoryId
             };
 
-            _categoryModel.CreateCategory(dto);
+            _categoryService.CreateCategory(dto);
             OnCategoryAdded?.Invoke();
             CloseAction?.Invoke();
         }

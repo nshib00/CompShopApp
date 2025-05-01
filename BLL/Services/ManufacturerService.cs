@@ -1,10 +1,11 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 
-namespace ComputerShop.Models
+namespace BLL.Services
 {
-    public class ManufacturerModel
+    public class ManufacturerService : IManufacturerService
     {
         private readonly AppDbContext _context = new AppDbContext();
 

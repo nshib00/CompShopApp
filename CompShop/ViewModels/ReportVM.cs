@@ -1,5 +1,6 @@
 ﻿using BLL.DTO;
-using CompShop.Models;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using CompShop.Utils;
 using CompShop.Views.Admin.Reports;
 using ComputerShop.Commands;
@@ -13,7 +14,7 @@ namespace CompShop.ViewModels
 {
     public class ReportVM : INotifyPropertyChanged
     {
-        private readonly ReportModel _reportModel = new ReportModel();
+        private readonly IReportService _reportModel = new ReportService();
 
         private ObservableCollection<object> _reportData;
         public ObservableCollection<object> ReportData

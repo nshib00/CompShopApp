@@ -1,15 +1,14 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using ComputerShop.Models;
 using ComputerShop.Commands;
+using BLL.Services.Interfaces;
 
 namespace ComputerShop.ViewModels
 {
     public class CartItemVM : INotifyPropertyChanged
     {
-        private readonly CartModel _model;
+        private readonly ICartService _cartService;
         private readonly int _cartId;
         public int ProductId { get; }
         public string ProductName { get; }
@@ -36,9 +35,11 @@ namespace ComputerShop.ViewModels
         public ICommand DecreaseQuantityCommand { get; }
         public ICommand RemoveItemCommand { get; }
 
-        public CartItemVM(CartModel model, int cartId, CartItemDto dto)
+        public ICartService CartService => _cartService;
+
+        public CartItemVM(ICartService cartService, int cartId, CartItemDto dto)
         {
-            _model = model;
+            _cartService = cartService;
             _cartId = cartId;
 
             ProductId = dto.ProductId;
@@ -48,7 +49,7 @@ namespace ComputerShop.ViewModels
 
             IncreaseQuantityCommand = new RelayCommand(_ =>
             {
-                _model.IncreaseProductQuantity(_cartId, ProductId, 1);
+                _cartService.IncreaseProductQuantity(_cartId, ProductId, 1);
                 Quantity += 1;
             });
 
@@ -56,14 +57,14 @@ namespace ComputerShop.ViewModels
             {
                 if (Quantity > 1)
                 {
-                    _model.IncreaseProductQuantity(_cartId, ProductId, -1);
+                    _cartService.IncreaseProductQuantity(_cartId, ProductId, -1);
                     Quantity -= 1;
                 }
             });
 
             RemoveItemCommand = new RelayCommand(_ =>
             {
-                _model.RemoveProductFromCart(_cartId, ProductId);
+                _cartService.RemoveProductFromCart(_cartId, ProductId);
                 OnRemoveRequested?.Invoke(this);
             });
         }

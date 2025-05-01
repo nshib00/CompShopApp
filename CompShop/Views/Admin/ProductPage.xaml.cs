@@ -1,6 +1,6 @@
 ﻿using CompShop.ViewModels;
 using DAL.Context;
-using DAL.Entities;
+using DAL.Models;
 using System.Windows;
 using System.Windows.Controls;
 

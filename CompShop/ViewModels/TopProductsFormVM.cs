@@ -1,4 +1,5 @@
-﻿using CompShop.Models;
+﻿using BLL.Services;
+using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -40,7 +41,7 @@ namespace CompShop.ViewModels
         }
         public ObservableCollection<TopProductReport> TopProductReports { get; set; } = new ObservableCollection<TopProductReport>();
 
-        private readonly ReportModel _reportModel = new ReportModel();
+        private readonly IReportService _reportService = new ReportService();
 
         public TopProductsFormVM()
         {
@@ -52,7 +53,7 @@ namespace CompShop.ViewModels
             if (TopSalesStartDate == null || TopSalesEndDate == null)
                 return;
 
-            var topProducts = _reportModel.GetTopSellingProducts(TopSalesStartDate.Value, TopSalesEndDate.Value, TopCount);
+            var topProducts = _reportService.GetTopSellingProducts(TopSalesStartDate.Value, TopSalesEndDate.Value, TopCount);
 
             var topProductReportData = topProducts.Select(tp => new TopProductReport
             {

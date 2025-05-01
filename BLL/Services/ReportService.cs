@@ -1,10 +1,11 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace CompShop.Models
+namespace BLL.Services
 {
-    public class ReportModel
+    public class ReportService : IReportService
     {
         private readonly AppDbContext _context = new AppDbContext();
 
@@ -88,19 +89,6 @@ namespace CompShop.Models
                 .ToList();
 
             return topProducts.Select(tp => (tp.ProductName, tp.TotalSold, tp.TotalAmount)).ToList();
-        }
-
-
-        public List<OrderStatusDto> GetOrderStatuses()
-        {
-            var statuses = _context.OrderStatuses.ToList();
-            return statuses.Select(s => new OrderStatusDto(s)).ToList();
-        }
-
-        public List<CategoryDto> GetCategories()
-        {
-            var categories = _context.Categories.ToList();
-            return categories.Select(c => new CategoryDto(c)).ToList();
         }
     }
 }

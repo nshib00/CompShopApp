@@ -1,6 +1,6 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,7 +11,7 @@ namespace CompShop.ViewModels
 {
     public class EditCategoryVM : INotifyPropertyChanged
     {
-        private readonly CategoryModel _categoryModel;
+        private readonly ICategoryService _categoryModel;
         private string _name;
         private int? _parentCategoryId;
         private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
@@ -21,7 +21,7 @@ namespace CompShop.ViewModels
 
         public Action CloseAction { get; set; }
 
-        public EditCategoryVM(CategoryModel categoryModel, int categoryId)
+        public EditCategoryVM(ICategoryService categoryModel, int categoryId)
         {
             _categoryModel = categoryModel;
             CategoryId = categoryId;

@@ -1,19 +1,19 @@
 ﻿using BLL.DTO;
-using BLL.Model;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows;
+using BLL.Services;
+using BLL.Services.Interfaces;
 
 public class AddEditProductVM : INotifyPropertyChanged
 {
-    private readonly ProductModel _productModel = new();
-    private readonly CategoryModel _categoryModel = new();
-    private readonly ManufacturerModel _manufacturerModel = new();
+    private readonly IProductService _productService = new ProductService();
+    private readonly ICategoryService _categoryService = new CategoryService();
+    private readonly IManufacturerService _manufacturerService = new ManufacturerService();
 
     public ObservableCollection<CategoryDto> Categories { get; } = new();
     public ObservableCollection<ManufacturerDto> Manufacturers { get; } = new();
@@ -25,7 +25,6 @@ public class AddEditProductVM : INotifyPropertyChanged
     private bool _isEditMode;
     private int _id;
 
-    // --- Привязанные свойства с OnPropertyChanged ---
     private string _name;
     public string Name
     {
@@ -75,7 +74,6 @@ public class AddEditProductVM : INotifyPropertyChanged
         set { _imagePath = value; OnPropertyChanged(); }
     }
 
-    // --- Конструкторы ---
     public AddEditProductVM()
     {
         InitializeCommands();
@@ -94,7 +92,7 @@ public class AddEditProductVM : INotifyPropertyChanged
             StockQuantity = product.StockQuantity;
             CategoryId = product.CategoryId;
             ManufacturerId = product.ManufacturerId;
-            ImagePath = product.ImagePath;
+            ImagePath = product.ImagePath ?? "";
         }
     }
 
@@ -108,11 +106,11 @@ public class AddEditProductVM : INotifyPropertyChanged
     private void LoadData()
     {
         Categories.Clear();
-        foreach (var category in _categoryModel.GetAllCategories())
+        foreach (var category in _categoryService.GetCategoriesWithData())
             Categories.Add(category);
 
         Manufacturers.Clear();
-        foreach (var manufacturer in _manufacturerModel.GetAllManufacturers())
+        foreach (var manufacturer in _manufacturerService.GetAllManufacturers())
             Manufacturers.Add(manufacturer);
     }
 
@@ -131,9 +129,9 @@ public class AddEditProductVM : INotifyPropertyChanged
         };
 
         if (_isEditMode)
-            _productModel.UpdateProduct(product);
+            _productService.UpdateProduct(product);
         else
-            _productModel.CreateProduct(product);
+            _productService.CreateProduct(product);
 
         MessageBox.Show("Товар успешно сохранён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 

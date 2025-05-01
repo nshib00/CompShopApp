@@ -1,6 +1,7 @@
 ﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -10,7 +11,7 @@ namespace CompShop.ViewModels
 {
     public class AddEditManufacturerVM : INotifyPropertyChanged
     {
-        private readonly ManufacturerModel _manufacturerModel = new();
+        private readonly IManufacturerService _manufacturerService = new ManufacturerService();
         private readonly Window _window;
 
         public event Action OnManufacturerSaved;
@@ -78,9 +79,9 @@ namespace CompShop.ViewModels
             try
             {
                 if (IsEditMode)
-                    _manufacturerModel.UpdateManufacturer(dto);
+                    _manufacturerService.UpdateManufacturer(dto);
                 else
-                    _manufacturerModel.CreateManufacturer(dto);
+                    _manufacturerService.CreateManufacturer(dto);
 
                 OnManufacturerSaved?.Invoke();
                 _window.Close();

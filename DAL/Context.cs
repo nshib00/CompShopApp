@@ -1,4 +1,4 @@
-﻿using DAL.Entities;
+﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Context
@@ -19,19 +19,14 @@ namespace DAL.Context
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
-        public DbSet<Discount> Discounts { get; set; }
-        public DbSet<Receipt> Receipts { get; set; }
         public DbSet<Delivery> Deliveries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Настройка схемы (для PostgreSQL)
             modelBuilder.HasDefaultSchema("public");
 
-            // Настройка пользователя
             modelBuilder.Entity<User>(entity =>
             {
-
                 entity.HasMany(u => u.Orders)
                     .WithOne(o => o.Customer)
                     .HasForeignKey(o => o.CustomerId)
@@ -45,7 +40,6 @@ namespace DAL.Context
                 entity.HasIndex(u => u.Email).IsUnique();
             });
 
-            // Иерархия категорий
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasOne(c => c.ParentCategory)
@@ -56,7 +50,6 @@ namespace DAL.Context
                 entity.HasIndex(c => new { c.Name, c.ParentCategoryId }).IsUnique();
             });
 
-            // Настройка продукта
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasOne(p => p.Manufacturer)
@@ -67,7 +60,6 @@ namespace DAL.Context
                 entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
             });
 
-            // Настройка корзины
             modelBuilder.Entity<Cart>(entity =>
             {
                 entity.HasMany(c => c.Items)
@@ -84,7 +76,6 @@ namespace DAL.Context
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // Настройка заказа
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasOne(o => o.Status)
@@ -97,10 +88,6 @@ namespace DAL.Context
                     .HasForeignKey(od => od.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(o => o.Receipt)
-                    .WithOne(r => r.Order)
-                    .HasForeignKey<Receipt>(r => r.OrderId)
-                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(o => o.Delivery)
                     .WithOne(d => d.Order)
@@ -108,7 +95,6 @@ namespace DAL.Context
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Настройка деталей заказа
             modelBuilder.Entity<OrderDetail>(entity =>
             {
                 entity.HasOne(od => od.Product)
@@ -124,7 +110,6 @@ namespace DAL.Context
                 entity.Property(od => od.UnitPrice).HasColumnType("decimal(18,2)");
             });
 
-            // Настройка скидки
             modelBuilder.Entity<Discount>()
                 .Property(d => d.Percentage)
                 .HasColumnType("decimal(5,2)");

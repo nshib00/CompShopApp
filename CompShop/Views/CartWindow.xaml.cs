@@ -1,7 +1,4 @@
 ﻿using System.Windows;
-using ComputerShop.Commands;
-using ComputerShop.ViewModels;
-using DAL.Entities;
 
 namespace ComputerShop.Views
 {

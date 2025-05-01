@@ -1,4 +1,6 @@
-﻿using CompShop.Models;
+﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -6,7 +8,7 @@ namespace CompShop.ViewModels
 {
     public class CategoryOrdersFormVM : INotifyPropertyChanged
     {
-        private readonly ReportModel _reportModel = new ReportModel();
+        private readonly IReportService _reportModel = new ReportService();
 
         private DateTime? _startDate;
         public DateTime? CategoryOrdersStartDate
@@ -30,32 +32,22 @@ namespace CompShop.ViewModels
             }
         }
 
-        // Список для хранения данных отчета
-        public ObservableCollection<CategoryReport> CategoryReports { get; set; } = new ObservableCollection<CategoryReport>();
+        public ObservableCollection<CategoryReportDto> CategoryReports { get; set; } = new ObservableCollection<CategoryReportDto>();
 
-        public CategoryOrdersFormVM()
-        {
-            // Инициализация, если нужно что-то подгрузить при старте
-        }
-
-        // Генерация отчета по категориям
         public void GenerateCategoryReport()
         {
             if (CategoryOrdersStartDate == null || CategoryOrdersEndDate == null)
                 return;
 
-            // Получаем данные по продажам для всех категорий за выбранный период
             var sales = _reportModel.GetSalesByCategories(CategoryOrdersStartDate.Value, CategoryOrdersEndDate.Value);
 
-            // Группируем по категории и суммируем проданное количество и сумму
-            var categoryReportData = sales.Select(s => new CategoryReport
+            var categoryReportData = sales.Select(s => new CategoryReportDto
             {
                 CategoryName = s.CategoryName,
                 TotalAmount = s.TotalAmount,
                 SoldQuantity = s.TotalSold
             }).ToList();
 
-            // Обновляем данные отчета
             CategoryReports.Clear();
             foreach (var report in categoryReportData)
             {
@@ -66,13 +58,5 @@ namespace CompShop.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    // Класс для представления отчета по категориям
-    public class CategoryReport
-    {
-        public string CategoryName { get; set; }
-        public decimal TotalAmount { get; set; }
-        public int SoldQuantity { get; set; }
     }
 }

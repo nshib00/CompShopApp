@@ -1,16 +1,17 @@
 ﻿using BLL.DTO;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows;
 using ComputerShop.Views;
+using BLL.Services.Interfaces;
+using BLL.Services;
 
 public class OrderVM : INotifyPropertyChanged
 {
-    private readonly OrderModel _orderModel = new OrderModel();
-    private readonly CartModel _cartModel = new CartModel(); // добавить модель корзины
+    private readonly IOrderService _orderService = new OrderService();
+    private readonly ICartService _cartService = new CartService();
 
     private ObservableCollection<OrderDetailDto> _orderDetails;
     private string _deliveryAddress;
@@ -54,7 +55,7 @@ public class OrderVM : INotifyPropertyChanged
 
     public OrderVM(int userId)
     {
-        LoadCartItemsAsOrderDetails(userId); // подгрузка из корзины
+        LoadCartItemsAsOrderDetails(userId);
 
         ConfirmOrderCommand = new RelayCommand(_ => ConfirmOrder(userId));
         BackCommand = new RelayCommand(_ => CloseWindowRequested?.Invoke());
@@ -62,7 +63,7 @@ public class OrderVM : INotifyPropertyChanged
 
     private void LoadCartItemsAsOrderDetails(int userId)
     {
-        var cart = _cartModel.GetCartByUserId(userId);
+        var cart = _cartService.GetCartByUserId(userId);
         if (cart != null)
         {
             var details = cart.Items.Select(item => new OrderDetailDto
@@ -99,15 +100,13 @@ public class OrderVM : INotifyPropertyChanged
             Items = OrderDetails.ToList()
         };
 
-        _orderModel.CreateOrder(order);
+        _orderService.CreateOrder(order);
 
         var successWindow = new OrderSuccess();
         successWindow.Show();
 
         CloseWindowRequested?.Invoke();
     }
-
-
 
     private void RecalculateTotal()
     {

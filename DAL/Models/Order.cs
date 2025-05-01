@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DAL.Entities
+namespace DAL.Models
 {
     public class Order
     {
@@ -21,7 +19,6 @@ namespace DAL.Entities
         public virtual User Customer { get; set; }
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual Receipt Receipt { get; set; }
         public virtual Delivery Delivery { get; set; }
     }
 }

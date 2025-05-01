@@ -1,20 +1,18 @@
-﻿using CompShop.Views;
+﻿using BLL.DTO;
+using BLL.Services;
+using CompShop.Views;
+using ComputerShop.Commands;
+using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
-using BLL.Model;
-using BLL.DTO;
-using ComputerShop.Commands;
-using ComputerShop.Views;
-using DAL.Entities;
-using ComputerShop.Models;
 
 namespace CompShop.ViewModels
 {
     public class ProductVM : INotifyPropertyChanged
     {
-        private readonly ProductModel _productModel = new();
-        private readonly CategoryModel _categoryModel = new();
+        private readonly ProductService _productModel = new();
+        private readonly CategoryService _categoryModel = new();
         private ObservableCollection<ProductDto> _products;
         private ObservableCollection<CategoryDto> _categories;
         private CategoryDto _selectedCategory;
@@ -34,7 +32,6 @@ namespace CompShop.ViewModels
             LoadProducts();
         }
 
-        // Свойства
         public ObservableCollection<ProductDto> Products
         {
             get => _products;
@@ -70,7 +67,7 @@ namespace CompShop.ViewModels
                 {
                     _selectedCategory = value;
                     OnPropertyChanged(nameof(SelectedCategory));
-                    LoadProducts(); // Загружаем товары при изменении категории
+                    LoadProducts();
                 }
             }
         }
@@ -88,23 +85,19 @@ namespace CompShop.ViewModels
             }
         }
 
-        // Метод для загрузки категорий
         private void LoadCategories()
         {
-            Categories = new ObservableCollection<CategoryDto>(_categoryModel.GetAllCategories());
+            Categories = new ObservableCollection<CategoryDto>(_categoryModel.GetCategories());
         }
 
-        // Метод для загрузки товаров
         private void LoadProducts()
         {
             if (SelectedCategory == null)
             {
-                // Если категория не выбрана, загружаем все товары
                 Products = new ObservableCollection<ProductDto>(_productModel.GetAllProducts());
             }
             else
             {
-                // Загружаем товары по выбранной категории
                 Products = new ObservableCollection<ProductDto>(_productModel.GetProductsByCategory(SelectedCategory.Id));
             }
         }
@@ -117,7 +110,7 @@ namespace CompShop.ViewModels
                 DataContext = viewModel
             };
             addProductWindow.ShowDialog();
-            LoadProducts(); // обновляем список после закрытия
+            LoadProducts();
         }
 
         private bool CanExecuteAddProduct(object parameter)
@@ -131,7 +124,7 @@ namespace CompShop.ViewModels
             {
                 var editWindow = new EditProductWindow(selectedProduct);
                 editWindow.ShowDialog();
-                LoadProducts(); // обновляем
+                LoadProducts();
             }
         }
 

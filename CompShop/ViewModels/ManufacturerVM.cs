@@ -1,8 +1,9 @@
 ﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using CompShop.ViewModels;
 using CompShop.Views;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -13,7 +14,7 @@ namespace ComputerShop.ViewModels
 {
     public class ManufacturerVM : INotifyPropertyChanged
     {
-        private readonly ManufacturerModel _manufacturerModel;
+        private readonly IManufacturerService _manufacturerService;
         private ManufacturerDto _selectedManufacturer;
 
         public ObservableCollection<ManufacturerDto> Manufacturers { get; } = new();
@@ -36,7 +37,7 @@ namespace ComputerShop.ViewModels
 
         public ManufacturerVM()
         {
-            _manufacturerModel = new ManufacturerModel();
+            _manufacturerService = new ManufacturerService();
 
             LoadManufacturersCommand = new RelayCommand(_ => LoadManufacturers());
             AddManufacturerCommand = new RelayCommand(_ => ShowAddManufacturerWindow());
@@ -49,7 +50,7 @@ namespace ComputerShop.ViewModels
         private void LoadManufacturers()
         {
             Manufacturers.Clear();
-            var manufacturers = _manufacturerModel.GetAllManufacturers();
+            var manufacturers = _manufacturerService.GetAllManufacturers();
             foreach (var m in manufacturers)
                 Manufacturers.Add(m);
         }
@@ -69,8 +70,6 @@ namespace ComputerShop.ViewModels
             window.DataContext = vm;
             window.ShowDialog();
         }
-
-
         private void ShowEditManufacturerWindow()
         {
             if (SelectedManufacturer == null) return;
@@ -88,8 +87,6 @@ namespace ComputerShop.ViewModels
             window.DataContext = vm;
             window.ShowDialog();
         }
-
-
         private void DeleteManufacturer()
         {
             if (SelectedManufacturer == null) return;
@@ -104,7 +101,7 @@ namespace ComputerShop.ViewModels
             {
                 try
                 {
-                    _manufacturerModel.DeleteManufacturer(SelectedManufacturer.Id);
+                    _manufacturerService.DeleteManufacturer(SelectedManufacturer.Id);
                     LoadManufacturers();
                     MessageBox.Show("Производитель удалён", "Успех",
                         MessageBoxButton.OK, MessageBoxImage.Information);

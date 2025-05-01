@@ -1,8 +1,9 @@
 ﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using CompShop.ViewModels;
 using CompShop.Views;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,19 +13,18 @@ using System.Windows.Input;
 
 namespace ComputerShop.ViewModels
 {
-    public class CategoryManagementViewModel : INotifyPropertyChanged
+    public class CategoryManagementVM : INotifyPropertyChanged
     {
-        private readonly CategoryModel _categoryModel;
+        private readonly ICategoryService _categoryService;
         private CategoryDto _selectedCategory;
         private string _searchText;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public CategoryManagementViewModel(CategoryModel categoryModel)
+        public CategoryManagementVM(ICategoryService categoryService)
         {
-            _categoryModel = categoryModel;
+            _categoryService = categoryService;
 
-            // Инициализация команд
             LoadCategoriesCommand = new RelayCommand(_ => LoadCategories());
             AddCategoryCommand = new RelayCommand(_ => ShowAddCategoryView());
             EditCategoryCommand = new RelayCommand(_ => ShowEditCategoryView(), CanEditDeleteCategory);
@@ -32,11 +32,9 @@ namespace ComputerShop.ViewModels
             SearchCommand = new RelayCommand(_ => SearchCategories());
             ShowCategoryDetailsCommand = new RelayCommand(_ => ShowCategoryDetails());
 
-            // Загрузка данных
             LoadCategories();
         }
 
-        // Свойства
         public ObservableCollection<CategoryDto> Categories { get; } = new ObservableCollection<CategoryDto>();
         public ObservableCollection<CategoryShortDto> AvailableParentCategories { get; } = new ObservableCollection<CategoryShortDto>();
 
@@ -69,11 +67,10 @@ namespace ComputerShop.ViewModels
         public ICommand SearchCommand { get; }
         public ICommand ShowCategoryDetailsCommand { get; }
 
-        // Методы
         private void LoadCategories()
         {
             Categories.Clear();
-            var categories = _categoryModel.GetAllCategories();
+            var categories = _categoryService.GetCategoriesWithData();
             foreach (var category in categories)
             {
                 Categories.Add(category);
@@ -85,7 +82,7 @@ namespace ComputerShop.ViewModels
         private void LoadAvailableParentCategories()
         {
             AvailableParentCategories.Clear();
-            var categories = _categoryModel.GetAllCategories();
+            var categories = _categoryService.GetCategoriesWithData();
             foreach (var category in categories)
             {
                 AvailableParentCategories.Add(new CategoryShortDto(category));
@@ -101,7 +98,7 @@ namespace ComputerShop.ViewModels
             }
 
             Categories.Clear();
-            var results = _categoryModel.SearchCategories(SearchText);
+            var results = _categoryService.SearchCategories(SearchText);
             foreach (var category in results)
             {
                 Categories.Add(category);
@@ -110,7 +107,7 @@ namespace ComputerShop.ViewModels
 
         private void ShowAddCategoryView()
         {
-            var addCategoryVM = new AddCategoryVM(_categoryModel);
+            var addCategoryVM = new AddCategoryVM(_categoryService);
             addCategoryVM.OnCategoryAdded += () =>
             {
                 LoadCategories();
@@ -133,7 +130,7 @@ namespace ComputerShop.ViewModels
         {
             if (SelectedCategory == null) return;
 
-            var editCategoryVM = new EditCategoryVM(_categoryModel, SelectedCategory.Id);
+            var editCategoryVM = new EditCategoryVM(_categoryService, SelectedCategory.Id);
             editCategoryVM.OnCategoryUpdated += () =>
             {
                 LoadCategories();
@@ -157,8 +154,7 @@ namespace ComputerShop.ViewModels
         {
             if (SelectedCategory == null) return;
 
-            var detailsVM = new CategoryDetailsVM(_categoryModel, SelectedCategory.Id);
-            detailsVM.OnBackRequested += () => { /* можно добавить логику при необходимости */ };
+            var detailsVM = new CategoryDetailsVM(_categoryService, SelectedCategory.Id);
 
             var window = new CategoryDetailsWindow
             {
@@ -182,7 +178,7 @@ namespace ComputerShop.ViewModels
             {
                 try
                 {
-                    _categoryModel.DeleteCategory(SelectedCategory.Id);
+                    _categoryService.DeleteCategory(SelectedCategory.Id);
                     LoadCategories();
                     MessageBox.Show("Категория успешно удалена", "Успех",
                         MessageBoxButton.OK, MessageBoxImage.Information);

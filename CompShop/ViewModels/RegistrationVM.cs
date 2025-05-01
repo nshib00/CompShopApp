@@ -1,7 +1,7 @@
 ﻿using BLL.DTO;
-using CompShop;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using ComputerShop.Models;
 using ComputerShop.Views;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -15,7 +15,7 @@ namespace ComputerShop.ViewModels
     {
         private readonly PasswordBox _passwordBox;
         private readonly PasswordBox _confirmPasswordBox;
-        private readonly UserModel _userModel = new UserModel();
+        private readonly IUserService _userService = new UserService();
 
         private string _firstName;
         private string _lastName;
@@ -100,7 +100,7 @@ namespace ComputerShop.ViewModels
                     Phone = Phone
                 };
 
-                _userModel.CreateUser(newUser);
+                _userService.CreateUser(newUser);
 
                 MessageBox.Show("Регистрация прошла успешно! Войдите в систему.", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
 

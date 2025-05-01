@@ -5,7 +5,6 @@ namespace DAL.Utils
 {
     public class PasswordHelper
     {
-        // Метод для хеширования пароля с использованием PBKDF2
         public static string HashPassword(string password)
         {
             byte[] salt = RandomNumberGenerator.GetBytes(16); // 128 бит
