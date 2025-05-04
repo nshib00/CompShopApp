@@ -5,7 +5,8 @@
         xmlns:helpers="clr-namespace:CompShop.Helpers"
         Title="CompShop | Вход"
         Height="400" Width="400"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 
     <materialDesign:Card UniformCornerRadius="8" Margin="16" Padding="16">
         <StackPanel Margin="0,0,0,-12">

@@ -1,5 +1,7 @@
 ﻿using BLL.DTO;
+using CompShop;
 using ComputerShop.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
@@ -12,7 +14,7 @@ namespace ComputerShop.Views
         {
             InitializeComponent();
 
-            var viewModel = new MainWindowVM();
+            var viewModel = App.ServiceProvider.GetRequiredService<MainWindowVM>();
             DataContext = viewModel;
 
             viewModel.LoginSuccess += OnLoginSuccess;
