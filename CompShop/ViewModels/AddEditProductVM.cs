@@ -2,11 +2,11 @@
 using BLL.Services;
 using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace CompShop.ViewModels
@@ -50,13 +50,14 @@ namespace CompShop.ViewModels
             if (dto == null) return;
 
             Id = dto.Id;
-            Name = dto.Name;
-            Description = dto.Description;
+            Name = dto.Name ?? string.Empty;
+            Description = dto.Description ?? string.Empty;
             Price = dto.Price;
             StockQuantity = dto.StockQuantity;
             CategoryId = dto.CategoryId;
             ManufacturerId = dto.ManufacturerId;
-            ImagePath = dto.ImagePath;
+            ImagePath = dto.ImagePath ?? string.Empty;
+
             IsEditMode = true;
         }
 
@@ -131,35 +132,35 @@ namespace CompShop.ViewModels
             if (string.IsNullOrWhiteSpace(Name))
             {
                 MessageBox.Show("Пожалуйста, укажите название товара",
-                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
             if (Price == null || Price <= 0)
             {
                 MessageBox.Show("Пожалуйста, укажите корректную цену товара",
-                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
             if (StockQuantity == null || StockQuantity < 0)
             {
                 MessageBox.Show("Пожалуйста, укажите корректное количество товара",
-                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
             if (CategoryId == null)
             {
                 MessageBox.Show("Пожалуйста, выберите категорию товара",
-                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
             if (ManufacturerId == null)
             {
                 MessageBox.Show("Пожалуйста, выберите производителя товара",
-                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
 
@@ -189,16 +190,23 @@ namespace CompShop.ViewModels
                 {
                     _productService.UpdateProduct(dto);
                     MessageBox.Show("Товар успешно обновлен!",
-                                 "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     _productService.CreateProduct(dto);
                     MessageBox.Show("Товар успешно добавлен!",
-                                 "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
                 OnProductSaved?.Invoke();
+
+                var dataGrid = _window.FindName("ProductsDataGrid") as DataGrid;
+                if (dataGrid != null)
+                {
+                    dataGrid.Items.Refresh();
+                }
+
                 _window.Close();
             }
             catch (Exception ex)

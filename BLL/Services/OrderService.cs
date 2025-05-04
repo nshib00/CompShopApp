@@ -32,6 +32,24 @@ namespace BLL.Services
 
             _context.Orders.Add(order);
             _context.SaveChanges();
+
+            foreach (var item in dto.Items)
+            {
+                var product = _context.Products.FirstOrDefault(p => p.Id == item.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity -= item.Quantity;
+
+                    if (product.StockQuantity < 0)
+                    {
+                        product.StockQuantity = 0;
+                    }
+
+                    _context.Products.Update(product);
+                }
+            }
+
+            _context.SaveChanges();
         }
 
 

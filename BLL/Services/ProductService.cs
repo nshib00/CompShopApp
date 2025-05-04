@@ -82,6 +82,16 @@ namespace BLL.Services
             return product != null ? new ProductDto(product) : null;
         }
 
+        public FullProductDto? GetFullProductById(int id)
+        {
+            var product = _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Manufacturer)
+                .FirstOrDefault(p => p.Id == id);
+
+            return product != null ? new FullProductDto(product) : null;
+        }
+
         public List<ProductShortDto> GetShortProductList()
         {
             return _context.Products

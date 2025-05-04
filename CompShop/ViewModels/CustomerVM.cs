@@ -44,7 +44,6 @@ public class CustomerVM : INotifyPropertyChanged
     public ICommand SearchCommand { get; }
     public ICommand OpenCartCommand { get; }
 
-    // Конструктор с DI
     public CustomerVM(IProductService productService, ICategoryService categoryService, ICartService cartService, Func<CartVM> cartVmFactory)
     {
         _productService = productService;
@@ -58,7 +57,6 @@ public class CustomerVM : INotifyPropertyChanged
         OpenCartCommand = new RelayCommand(OpenCart);
     }
 
-    // Метод инициализации пользователя (вместо конструктора)
     public void Initialize(UserDto user)
     {
         _currentUser = user;

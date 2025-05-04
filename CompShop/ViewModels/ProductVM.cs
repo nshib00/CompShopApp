@@ -119,11 +119,21 @@ namespace CompShop.ViewModels
         {
             if (parameter is ProductDto selectedProduct)
             {
-                var editWindow = new EditProductWindow();
-                editWindow.ShowDialog();
-                LoadProducts();
+                var fullProduct = _productService.GetFullProductById(selectedProduct.Id);
+                if (fullProduct != null)
+                {
+                    var editWindow = new EditProductWindow();
+                    var vm = new AddEditProductVM(editWindow);
+                    vm.SetProduct(fullProduct);
+                    editWindow.DataContext = vm;
+
+                    editWindow.ShowDialog();
+                    LoadProducts();
+                }
             }
         }
+
+
 
         private bool CanExecuteEditProduct(object parameter) => parameter is ProductDto;
 

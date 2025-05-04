@@ -17,6 +17,7 @@ namespace BLL.Services.Interfaces
         List<ProductDto> GetAllProducts();
         List<ProductDto> GetProductsByCategory(int categoryId);
         ProductDto? GetProductById(int id);
+        FullProductDto? GetFullProductById(int id);
         List<ProductShortDto> GetShortProductList();
         List<ProductDto> GetProductsBySearch(string searchText, int? categoryId = null);
     }
