@@ -104,11 +104,7 @@ namespace CompShop.ViewModels
 
         private void AddProduct(object parameter)
         {
-            var viewModel = new AddEditProductVM();
-            var addProductWindow = new AddProductWindow
-            {
-                DataContext = viewModel
-            };
+            var addProductWindow = new AddProductWindow();
             addProductWindow.ShowDialog();
             LoadProducts();
         }
@@ -122,7 +118,8 @@ namespace CompShop.ViewModels
         {
             if (parameter is ProductDto selectedProduct)
             {
-                var editWindow = new EditProductWindow(selectedProduct);
+
+                var editWindow = new EditProductWindow();
                 editWindow.ShowDialog();
                 LoadProducts();
             }

@@ -1,167 +1,228 @@
 ﻿using BLL.DTO;
+using BLL.Services;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
-using Microsoft.Win32;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using System.Windows;
-using BLL.Services;
-using BLL.Services.Interfaces;
+using System.Windows.Input;
 
-public class AddEditProductVM : INotifyPropertyChanged
+namespace CompShop.ViewModels
 {
-    private readonly IProductService _productService = new ProductService();
-    private readonly ICategoryService _categoryService = new CategoryService();
-    private readonly IManufacturerService _manufacturerService = new ManufacturerService();
-
-    public ObservableCollection<CategoryDto> Categories { get; } = new();
-    public ObservableCollection<ManufacturerDto> Manufacturers { get; } = new();
-
-    public ICommand SaveProductCommand { get; set; }
-    public ICommand CancelCommand { get; set; }
-    public ICommand BrowseImageCommand { get; set; }
-
-    private bool _isEditMode;
-    private int _id;
-
-    private string _name;
-    public string Name
+    public class AddEditProductVM : INotifyPropertyChanged
     {
-        get => _name;
-        set { _name = value; OnPropertyChanged(); }
-    }
+        private readonly IProductService _productService = new ProductService();
+        private readonly ICategoryService _categoryService = new CategoryService();
+        private readonly IManufacturerService _manufacturerService = new ManufacturerService();
+        private readonly Window _window;
 
-    private string _description;
-    public string Description
-    {
-        get => _description;
-        set { _description = value; OnPropertyChanged(); }
-    }
+        public ObservableCollection<CategoryDto> Categories { get; } = new();
+        public ObservableCollection<ManufacturerDto> Manufacturers { get; } = new();
 
-    private decimal? _price;
-    public decimal? Price
-    {
-        get => _price;
-        set { _price = value; OnPropertyChanged(); }
-    }
+        public event Action OnProductSaved;
 
-    private int? _stockQuantity;
-    public int? StockQuantity
-    {
-        get => _stockQuantity;
-        set { _stockQuantity = value; OnPropertyChanged(); }
-    }
+        private int _id;
+        private string _name;
+        private string _description;
+        private decimal? _price;
+        private int? _stockQuantity;
+        private int? _categoryId;
+        private int? _manufacturerId;
+        private string _imagePath;
 
-    private int? _categoryId;
-    public int? CategoryId
-    {
-        get => _categoryId;
-        set { _categoryId = value; OnPropertyChanged(); }
-    }
+        public bool IsEditMode { get; set; }
 
-    private int? _manufacturerId;
-    public int? ManufacturerId
-    {
-        get => _manufacturerId;
-        set { _manufacturerId = value; OnPropertyChanged(); }
-    }
-
-    private string _imagePath;
-    public string ImagePath
-    {
-        get => _imagePath;
-        set { _imagePath = value; OnPropertyChanged(); }
-    }
-
-    public AddEditProductVM()
-    {
-        InitializeCommands();
-        LoadData();
-    }
-
-    public AddEditProductVM(FullProductDto product) : this()
-    {
-        if (product != null)
+        public AddEditProductVM(Window window)
         {
-            _isEditMode = true;
-            _id = product.Id;
-            Name = product.Name;
-            Description = product.Description;
-            Price = product.Price;
-            StockQuantity = product.StockQuantity;
-            CategoryId = product.CategoryId;
-            ManufacturerId = product.ManufacturerId;
-            ImagePath = product.ImagePath ?? "";
+            _window = window;
+            SaveProductCommand = new RelayCommand(SaveProduct);
+            CancelCommand = new RelayCommand(_ => _window.Close());
+            BrowseImageCommand = new RelayCommand(BrowseImage);
+
+            LoadCategories();
+            LoadManufacturers();
         }
-    }
 
-    private void InitializeCommands()
-    {
-        SaveProductCommand = new RelayCommand(SaveProduct);
-        CancelCommand = new RelayCommand(Cancel);
-        BrowseImageCommand = new RelayCommand(BrowseImage);
-    }
-
-    private void LoadData()
-    {
-        Categories.Clear();
-        foreach (var category in _categoryService.GetCategoriesWithData())
-            Categories.Add(category);
-
-        Manufacturers.Clear();
-        foreach (var manufacturer in _manufacturerService.GetAllManufacturers())
-            Manufacturers.Add(manufacturer);
-    }
-
-    private void SaveProduct(object obj)
-    {
-        var product = new FullProductDto
+        public void SetProduct(FullProductDto dto)
         {
-            Id = _id,
-            Name = Name,
-            Description = Description,
-            Price = Price ?? 0,
-            StockQuantity = StockQuantity ?? 0,
-            CategoryId = CategoryId,
-            ManufacturerId = ManufacturerId,
-            ImagePath = ImagePath
-        };
+            if (dto == null) return;
 
-        if (_isEditMode)
-            _productService.UpdateProduct(product);
-        else
-            _productService.CreateProduct(product);
-
-        MessageBox.Show("Товар успешно сохранён", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-
-        CloseWindow(obj as Window);
-    }
-
-    private void Cancel(object obj)
-    {
-        CloseWindow(obj as Window);
-    }
-
-    private void BrowseImage(object obj)
-    {
-        OpenFileDialog dialog = new OpenFileDialog
-        {
-            Filter = "Image files (*.png;*.jpg)|*.png;*.jpg"
-        };
-        if (dialog.ShowDialog() == true)
-        {
-            ImagePath = dialog.FileName;
+            Id = dto.Id;
+            Name = dto.Name;
+            Description = dto.Description;
+            Price = dto.Price;
+            StockQuantity = dto.StockQuantity;
+            CategoryId = dto.CategoryId;
+            ManufacturerId = dto.ManufacturerId;
+            ImagePath = dto.ImagePath;
+            IsEditMode = true;
         }
-    }
 
-    private void CloseWindow(Window window)
-    {
-        if (window != null)
-            window.Close();
-    }
+        public int Id
+        {
+            get => _id;
+            set { _id = value; OnPropertyChanged(); }
+        }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public string Name
+        {
+            get => _name;
+            set { _name = value; OnPropertyChanged(); }
+        }
+
+        public string Description
+        {
+            get => _description;
+            set { _description = value; OnPropertyChanged(); }
+        }
+
+        public decimal? Price
+        {
+            get => _price;
+            set { _price = value; OnPropertyChanged(); }
+        }
+
+        public int? StockQuantity
+        {
+            get => _stockQuantity;
+            set { _stockQuantity = value; OnPropertyChanged(); }
+        }
+
+        public int? CategoryId
+        {
+            get => _categoryId;
+            set { _categoryId = value; OnPropertyChanged(); }
+        }
+
+        public int? ManufacturerId
+        {
+            get => _manufacturerId;
+            set { _manufacturerId = value; OnPropertyChanged(); }
+        }
+
+        public string ImagePath
+        {
+            get => _imagePath;
+            set { _imagePath = value; OnPropertyChanged(); }
+        }
+
+        public ICommand SaveProductCommand { get; }
+        public ICommand CancelCommand { get; }
+        public ICommand BrowseImageCommand { get; }
+
+        private void LoadCategories()
+        {
+            Categories.Clear();
+            foreach (var category in _categoryService.GetCategoriesWithData())
+                Categories.Add(category);
+        }
+
+        private void LoadManufacturers()
+        {
+            Manufacturers.Clear();
+            foreach (var manufacturer in _manufacturerService.GetAllManufacturers())
+                Manufacturers.Add(manufacturer);
+        }
+
+        private bool ValidateFields()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                MessageBox.Show("Пожалуйста, укажите название товара",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (Price == null || Price <= 0)
+            {
+                MessageBox.Show("Пожалуйста, укажите корректную цену товара",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (StockQuantity == null || StockQuantity < 0)
+            {
+                MessageBox.Show("Пожалуйста, укажите корректное количество товара",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (CategoryId == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите категорию товара",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (ManufacturerId == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите производителя товара",
+                              "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void SaveProduct(object obj)
+        {
+            if (!ValidateFields())
+                return;
+
+            var dto = new FullProductDto
+            {
+                Id = Id,
+                Name = Name,
+                Description = Description,
+                Price = Price ?? 0,
+                StockQuantity = StockQuantity ?? 0,
+                CategoryId = CategoryId,
+                ManufacturerId = ManufacturerId,
+                ImagePath = ImagePath
+            };
+
+            try
+            {
+                if (IsEditMode)
+                {
+                    _productService.UpdateProduct(dto);
+                    MessageBox.Show("Товар успешно обновлен!",
+                                 "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    _productService.CreateProduct(dto);
+                    MessageBox.Show("Товар успешно добавлен!",
+                                 "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                OnProductSaved?.Invoke();
+                _window.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении товара: {ex.Message}",
+                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BrowseImage(object obj)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image files (*.png;*.jpg)|*.png;*.jpg"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                ImagePath = dialog.FileName;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 }

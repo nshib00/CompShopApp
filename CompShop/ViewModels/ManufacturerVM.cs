@@ -1,5 +1,4 @@
 ﻿using BLL.DTO;
-using BLL.Services;
 using BLL.Services.Interfaces;
 using CompShop.ViewModels;
 using CompShop.Views;
@@ -35,9 +34,10 @@ namespace ComputerShop.ViewModels
         public ICommand EditManufacturerCommand { get; }
         public ICommand DeleteManufacturerCommand { get; }
 
-        public ManufacturerVM()
+        // Внедрение IManufacturerService через конструктор
+        public ManufacturerVM(IManufacturerService manufacturerService)
         {
-            _manufacturerService = new ManufacturerService();
+            _manufacturerService = manufacturerService;
 
             LoadManufacturersCommand = new RelayCommand(_ => LoadManufacturers());
             AddManufacturerCommand = new RelayCommand(_ => ShowAddManufacturerWindow());
@@ -58,7 +58,7 @@ namespace ComputerShop.ViewModels
         private void ShowAddManufacturerWindow()
         {
             var window = new AddManufacturerWindow();
-            var vm = new AddEditManufacturerVM(window);
+            var vm = new AddEditManufacturerVM(window, _manufacturerService); // передаём сервис в VM
 
             vm.OnManufacturerSaved += () =>
             {
@@ -70,12 +70,19 @@ namespace ComputerShop.ViewModels
             window.DataContext = vm;
             window.ShowDialog();
         }
+
         private void ShowEditManufacturerWindow()
         {
-            if (SelectedManufacturer == null) return;
+            if (SelectedManufacturer == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите производителя для редактирования",
+                              "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             var window = new AddManufacturerWindow { Title = "Редактировать производителя" };
-            var vm = new AddEditManufacturerVM(window);
+            var vm = new AddEditManufacturerVM(window, _manufacturerService); // тоже передаём сервис
+
             vm.SetManufacturer(SelectedManufacturer);
             vm.OnManufacturerSaved += () =>
             {
@@ -87,9 +94,15 @@ namespace ComputerShop.ViewModels
             window.DataContext = vm;
             window.ShowDialog();
         }
+
         private void DeleteManufacturer()
         {
-            if (SelectedManufacturer == null) return;
+            if (SelectedManufacturer == null)
+            {
+                MessageBox.Show("Пожалуйста, выберите производителя для удаления",
+                              "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             var result = MessageBox.Show(
                 $"Удалить производителя '{SelectedManufacturer.Name}'?",

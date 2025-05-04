@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using CompShop.ViewModels;
+using System.Windows;
 
 namespace ComputerShop.Views
 {
@@ -7,6 +8,7 @@ namespace ComputerShop.Views
         public AddProductWindow()
         {
             InitializeComponent();
+            DataContext = new AddEditProductVM(this);
         }
     }
 }
