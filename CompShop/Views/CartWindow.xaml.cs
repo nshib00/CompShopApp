@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ComputerShop.ViewModels;
+using System.Windows;
 
 namespace ComputerShop.Views
 {

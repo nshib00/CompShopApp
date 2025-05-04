@@ -1,5 +1,4 @@
 ﻿using BLL.DTO;
-using BLL.Services;
 using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,7 +7,13 @@ namespace CompShop.ViewModels
 {
     public class TotalOrdersFormVM : INotifyPropertyChanged
     {
-        private readonly IOrderStatusService _orderStatusService = new OrderStatusService();
+        private readonly IOrderStatusService _orderStatusService;
+
+        public TotalOrdersFormVM(IOrderStatusService orderStatusService)
+        {
+            _orderStatusService = orderStatusService;
+            LoadOrderStatuses();
+        }
 
         public ObservableCollection<OrderStatusDto> OrderStatuses { get; set; } = new ObservableCollection<OrderStatusDto>();
 
@@ -43,11 +48,6 @@ namespace CompShop.ViewModels
                 _endDate = value;
                 OnPropertyChanged(nameof(TotalOrdersEndDate));
             }
-        }
-
-        public TotalOrdersFormVM()
-        {
-            LoadOrderStatuses();
         }
 
         private void LoadOrderStatuses()

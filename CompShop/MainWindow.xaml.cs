@@ -29,12 +29,13 @@ namespace ComputerShop.Views
                 nextWindow = new AdminWindow();
             else
             {
-                var vm = new CustomerVM(user);
-                nextWindow = new CustomerWindow(vm);
+                var customerVM = App.ServiceProvider.GetRequiredService<CustomerVM>();
+                customerVM.Initialize(user);
+                nextWindow = new CustomerWindow(customerVM);
             }
 
             nextWindow.Show();
-            this.Close();
+            Close();
         }
 
         private void OnNavigateToRegistrationRequested()

@@ -1,5 +1,4 @@
-﻿using BLL.Services;
-using BLL.Services.Interfaces;
+﻿using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -7,6 +6,14 @@ namespace CompShop.ViewModels
 {
     public class TopProductsFormVM : INotifyPropertyChanged
     {
+        private readonly IReportService _reportService;
+
+        public TopProductsFormVM(IReportService reportService)
+        {
+            _reportService = reportService;
+            TopCount = 10;
+        }
+
         private DateTime? _startDate;
         public DateTime? TopSalesStartDate
         {
@@ -39,14 +46,8 @@ namespace CompShop.ViewModels
                 OnPropertyChanged(nameof(TopCount));
             }
         }
+
         public ObservableCollection<TopProductReport> TopProductReports { get; set; } = new ObservableCollection<TopProductReport>();
-
-        private readonly IReportService _reportService = new ReportService();
-
-        public TopProductsFormVM()
-        {
-            TopCount = 10;
-        }
 
         public void GenerateTopProductReport()
         {
@@ -55,12 +56,15 @@ namespace CompShop.ViewModels
 
             var topProducts = _reportService.GetTopSellingProducts(TopSalesStartDate.Value, TopSalesEndDate.Value, TopCount);
 
-            var topProductReportData = topProducts.Select(tp => new TopProductReport
-            {
-                ProductName = tp.ProductName,
-                SoldQuantity = tp.TotalSold,
-                TotalAmount = tp.TotalAmount
-            }).ToList();
+            var topProductReportData = topProducts
+                .Select(tp => new TopProductReport
+                {
+                    ProductName = tp.ProductName,
+                    SoldQuantity = tp.TotalSold,
+                    TotalAmount = tp.TotalAmount
+                })
+                .OrderByDescending(s => s.TotalAmount)
+                .ToList();
 
             TopProductReports.Clear();
             foreach (var report in topProductReportData)

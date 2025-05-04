@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Windows;
-using CompShop.ViewModels;
-using BLL.Services;
+﻿using BLL.Services;
 using BLL.Services.Interfaces;
+using CompShop.ViewModels;
+using CompShop.Views.Admin.Reports;
+using CompShop.Views.Pages;
 using ComputerShop.ViewModels;
-using ComputerShop.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace CompShop
 {
@@ -53,6 +53,13 @@ namespace CompShop
             services.AddTransient<TopProductsFormVM>();
             services.AddTransient<TotalOrdersFormVM>();
             services.AddTransient<LoginVM>();
+
+            services.AddTransient<ManufacturerPage>();
+            services.AddTransient<CategoryOrdersForm>();
+
+            services.AddTransient<Func<CartVM>>(sp => () => sp.GetRequiredService<CartVM>());
+            services.AddTransient<Func<int, EditCategoryVM>>(sp => id => ActivatorUtilities.CreateInstance<EditCategoryVM>(sp, id));
+            services.AddTransient<Func<int, CategoryDetailsVM>>(sp => id => ActivatorUtilities.CreateInstance<CategoryDetailsVM>(sp, id));
         }
     }
 }

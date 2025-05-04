@@ -1,5 +1,4 @@
 ﻿using BLL.DTO;
-using BLL.Services;
 using BLL.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,7 +7,12 @@ namespace CompShop.ViewModels
 {
     public class CategoryOrdersFormVM : INotifyPropertyChanged
     {
-        private readonly IReportService _reportModel = new ReportService();
+        private readonly IReportService _reportService;
+
+        public CategoryOrdersFormVM(IReportService reportService)
+        {
+            _reportService = reportService;
+        }
 
         private DateTime? _startDate;
         public DateTime? CategoryOrdersStartDate
@@ -32,21 +36,22 @@ namespace CompShop.ViewModels
             }
         }
 
-        public ObservableCollection<CategoryReportDto> CategoryReports { get; set; } = new ObservableCollection<CategoryReportDto>();
+        public ObservableCollection<CategoryReportDto> CategoryReports { get; } = new();
 
         public void GenerateCategoryReport()
         {
             if (CategoryOrdersStartDate == null || CategoryOrdersEndDate == null)
                 return;
 
-            var sales = _reportModel.GetSalesByCategories(CategoryOrdersStartDate.Value, CategoryOrdersEndDate.Value);
+            var sales = _reportService.GetSalesByCategories(CategoryOrdersStartDate.Value, CategoryOrdersEndDate.Value);
 
             var categoryReportData = sales.Select(s => new CategoryReportDto
             {
                 CategoryName = s.CategoryName,
                 TotalAmount = s.TotalAmount,
                 SoldQuantity = s.TotalSold
-            }).ToList();
+            }).OrderByDescending(s => s.TotalAmount)
+            .ToList();
 
             CategoryReports.Clear();
             foreach (var report in categoryReportData)

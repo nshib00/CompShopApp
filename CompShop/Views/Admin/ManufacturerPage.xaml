@@ -36,7 +36,6 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-
                     <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="400">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -45,9 +44,7 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-
                     <DataGridTextColumn Header="Страна" Binding="{Binding Country}" Width="150"/>
-
                     <DataGridTemplateColumn Header="Действия" Width="280">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

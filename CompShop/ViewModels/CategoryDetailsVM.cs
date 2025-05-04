@@ -15,16 +15,13 @@ namespace CompShop.ViewModels
         public event Action OnBackRequested;
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public CategoryDetailsVM(ICategoryService categoryService, int categoryId)
+        public CategoryDetailsVM(ICategoryService categoryService)
         {
             _categoryService = categoryService;
-            CategoryId = categoryId;
-            LoadCategoryDetails();
-
             BackCommand = new RelayCommand(_ => OnBackRequested?.Invoke());
         }
 
-        public int CategoryId { get; }
+        public int CategoryId { get; private set; }
 
         public CategoryWithHierarchyDto Category
         {
@@ -37,6 +34,12 @@ namespace CompShop.ViewModels
         }
 
         public ICommand BackCommand { get; }
+
+        public void Initialize(int categoryId)
+        {
+            CategoryId = categoryId;
+            LoadCategoryDetails();
+        }
 
         private void LoadCategoryDetails()
         {

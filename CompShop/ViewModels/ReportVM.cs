@@ -4,6 +4,7 @@ using BLL.Services.Interfaces;
 using CompShop.Utils;
 using CompShop.Views.Admin.Reports;
 using ComputerShop.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,7 +15,7 @@ namespace CompShop.ViewModels
 {
     public class ReportVM : INotifyPropertyChanged
     {
-        private readonly IReportService _reportModel = new ReportService();
+        private readonly IReportService _reportService;
 
         private ObservableCollection<object> _reportData;
         public ObservableCollection<object> ReportData
@@ -32,8 +33,10 @@ namespace CompShop.ViewModels
         public ICommand GenerateTopProductsReportCommand { get; }
         public ICommand ExportReportToPdfCommand { get; }
 
-        public ReportVM()
+        public ReportVM(IReportService reportService)
         {
+            _reportService = reportService;
+
             GenerateTotalOrdersReportCommand = new RelayCommand(
                 execute: (param) => OpenTotalOrdersForm(),
                 canExecute: (param) => true
@@ -68,7 +71,7 @@ namespace CompShop.ViewModels
 
         private void OpenCategoryOrdersForm()
         {
-            var window = new CategoryOrdersForm();
+            var window = App.ServiceProvider.GetRequiredService<CategoryOrdersForm>();
             if (window.ShowDialog() == true)
             {
                 LoadCategorySalesReport(window.ReportParameters);
@@ -90,11 +93,11 @@ namespace CompShop.ViewModels
 
             if (string.IsNullOrEmpty(parameters.SelectedStatus))
             {
-                orders = _reportModel.GetOrdersByDateRange(parameters.StartDate, parameters.EndDate);
+                orders = _reportService.GetOrdersByDateRange(parameters.StartDate, parameters.EndDate);
             }
             else
             {
-                orders = _reportModel.GetOrdersByDateRangeAndStatus(parameters.StartDate, parameters.EndDate, parameters.SelectedStatus);
+                orders = _reportService.GetOrdersByDateRangeAndStatus(parameters.StartDate, parameters.EndDate, parameters.SelectedStatus);
             }
 
             var report = orders.Select(o => new
@@ -112,7 +115,7 @@ namespace CompShop.ViewModels
         private void LoadCategorySalesReport(CategoryOrdersDto parameters)
         {
             // Получаем данные о продажах по категориям за указанный период
-            var sales = _reportModel.GetSalesByCategories(parameters.StartDate, parameters.EndDate);
+            var sales = _reportService.GetSalesByCategories(parameters.StartDate, parameters.EndDate);
 
             // Формируем отчет, группируя данные по категориям и вычисляя нужные агрегаты
             var categoryReport = sales.Select(s => new
@@ -130,7 +133,7 @@ namespace CompShop.ViewModels
 
         private void LoadTopSalesReport(TopProductsDto parameters)
         {
-            var topProducts = _reportModel.GetTopSellingProducts(parameters.StartDate, parameters.EndDate, parameters.TopCount);
+            var topProducts = _reportService.GetTopSellingProducts(parameters.StartDate, parameters.EndDate, parameters.TopCount);
 
             var topReport = topProducts.Select(tp => new
             {

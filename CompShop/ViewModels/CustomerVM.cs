@@ -1,7 +1,7 @@
 ﻿using BLL.DTO;
-using BLL.Services;
 using BLL.Services.Interfaces;
 using ComputerShop.Commands;
+using ComputerShop.ViewModels;
 using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +13,8 @@ public class CustomerVM : INotifyPropertyChanged
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
     private readonly ICartService _cartService;
+    private readonly Func<CartVM> _cartVmFactory; // фабрика CartVM из DI
+
     private ObservableCollection<ProductDto> _products;
     private ObservableCollection<CategoryDto> _categories;
     private CategoryDto _selectedCategory;
@@ -42,17 +44,24 @@ public class CustomerVM : INotifyPropertyChanged
     public ICommand SearchCommand { get; }
     public ICommand OpenCartCommand { get; }
 
-    public CustomerVM(UserDto user)
+    // Конструктор с DI
+    public CustomerVM(IProductService productService, ICategoryService categoryService, ICartService cartService, Func<CartVM> cartVmFactory)
     {
-        _currentUser = user;
-        _productService = new ProductService();
-        _categoryService = new CategoryService();
-        _cartService = new CartService();
+        _productService = productService;
+        _categoryService = categoryService;
+        _cartService = cartService;
+        _cartVmFactory = cartVmFactory;
 
         LogoutCommand = new RelayCommand(Logout);
         AddToCartCommand = new RelayCommand(AddToCart);
         SearchCommand = new RelayCommand(ExecuteSearch);
         OpenCartCommand = new RelayCommand(OpenCart);
+    }
+
+    // Метод инициализации пользователя (вместо конструктора)
+    public void Initialize(UserDto user)
+    {
+        _currentUser = user;
 
         LoadCategories();
         LoadProducts();
@@ -149,10 +158,11 @@ public class CustomerVM : INotifyPropertyChanged
     {
         if (_currentUser != null)
         {
-            var cartViewModel = new CartVM(_currentUser.Id);
+            var cartViewModel = _cartVmFactory.Invoke();
+            cartViewModel.Initialize(_currentUser.Id);
             cartViewModel.CartUpdated += UpdateCartItemCount;
-            var cartWindow = new CartWindow(cartViewModel);
 
+            var cartWindow = new CartWindow(cartViewModel);
             cartWindow.Closed += (s, e) => UpdateCartItemCount();
             cartWindow.ShowDialog();
         }
@@ -161,6 +171,7 @@ public class CustomerVM : INotifyPropertyChanged
     public void Logout(object parameter)
     {
         _currentUser = null;
+
         Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is CartWindow)?.Close();
         new MainWindow().Show();
         Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Window)?.Close();

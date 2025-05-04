@@ -1,4 +1,5 @@
 ﻿using CompShop.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
 
 namespace CompShop.Views.Pages
@@ -8,7 +9,7 @@ namespace CompShop.Views.Pages
         public ReportPage()
         {
             InitializeComponent();
-            DataContext = new ReportVM();
+            DataContext = App.ServiceProvider.GetRequiredService<ReportVM>();
         }
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

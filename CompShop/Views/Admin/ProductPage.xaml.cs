@@ -1,7 +1,5 @@
 ﻿using CompShop.ViewModels;
-using DAL.Context;
-using DAL.Models;
-using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
 
 namespace CompShop.Views.Pages
@@ -11,7 +9,7 @@ namespace CompShop.Views.Pages
         public ProductPage()
         {
             InitializeComponent();
-            DataContext = new ProductVM();
+            DataContext = App.ServiceProvider.GetRequiredService<ProductVM>();
         }
     }
 }

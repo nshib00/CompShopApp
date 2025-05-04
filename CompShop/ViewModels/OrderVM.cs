@@ -1,17 +1,16 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
+using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Input;
 using System.Windows;
-using ComputerShop.Views;
-using BLL.Services.Interfaces;
-using BLL.Services;
+using System.Windows.Input;
 
 public class OrderVM : INotifyPropertyChanged
 {
-    private readonly IOrderService _orderService = new OrderService();
-    private readonly ICartService _cartService = new CartService();
+    private readonly IOrderService _orderService;
+    private readonly ICartService _cartService;
 
     private ObservableCollection<OrderDetailDto> _orderDetails;
     private string _deliveryAddress;
@@ -53,8 +52,11 @@ public class OrderVM : INotifyPropertyChanged
 
     public event Action CloseWindowRequested;
 
-    public OrderVM(int userId)
+    public OrderVM(int userId, IOrderService orderService, ICartService cartService)
     {
+        _orderService = orderService;
+        _cartService = cartService;
+
         LoadCartItemsAsOrderDetails(userId);
 
         ConfirmOrderCommand = new RelayCommand(_ => ConfirmOrder(userId));

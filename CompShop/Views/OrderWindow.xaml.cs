@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using CompShop;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace ComputerShop.Views
 {
@@ -7,7 +9,7 @@ namespace ComputerShop.Views
         public OrderWindow(int userId)
         {
             InitializeComponent();
-            var vm = new OrderVM(userId);
+            var vm = App.ServiceProvider.GetRequiredService<OrderVM>();
             vm.CloseWindowRequested += Close;
             DataContext = vm;
         }

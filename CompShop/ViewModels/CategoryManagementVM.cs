@@ -1,10 +1,12 @@
 ﻿using BLL.DTO;
 using BLL.Services;
 using BLL.Services.Interfaces;
+using CompShop;
 using CompShop.ViewModels;
 using CompShop.Views;
 using ComputerShop.Commands;
 using ComputerShop.Views;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -154,7 +156,8 @@ namespace ComputerShop.ViewModels
         {
             if (SelectedCategory == null) return;
 
-            var detailsVM = new CategoryDetailsVM(_categoryService, SelectedCategory.Id);
+            var detailsVM = App.ServiceProvider.GetRequiredService<CategoryDetailsVM>();
+            detailsVM.Initialize(SelectedCategory.Id);
 
             var window = new CategoryDetailsWindow
             {

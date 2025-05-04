@@ -11,28 +11,26 @@ namespace CompShop.ViewModels
 {
     public class EditCategoryVM : INotifyPropertyChanged
     {
-        private readonly ICategoryService _categoryModel;
-        private string _name;
-        private int? _parentCategoryId;
-        private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
+        private readonly ICategoryService _categoryService;
 
         public event Action OnCategoryUpdated;
         public event PropertyChangedEventHandler PropertyChanged;
-
         public Action CloseAction { get; set; }
 
-        public EditCategoryVM(ICategoryService categoryModel, int categoryId)
+        public EditCategoryVM(ICategoryService categoryService, int categoryId)
         {
-            _categoryModel = categoryModel;
+            _categoryService = categoryService;
             CategoryId = categoryId;
-            LoadCategoryData();
 
             SaveCommand = new RelayCommand(_ => SaveChanges());
             CancelCommand = new RelayCommand(_ => Cancel());
+
+            LoadCategoryData();
         }
 
         public int CategoryId { get; }
 
+        private string _name;
         public string Name
         {
             get => _name;
@@ -43,6 +41,7 @@ namespace CompShop.ViewModels
             }
         }
 
+        private int? _parentCategoryId;
         public int? ParentCategoryId
         {
             get => _parentCategoryId;
@@ -53,23 +52,23 @@ namespace CompShop.ViewModels
             }
         }
 
-        public ObservableCollection<CategoryShortDto> Categories => _categories;
+        public ObservableCollection<CategoryShortDto> Categories { get; } = new();
 
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
 
         public void SetCategories(ObservableCollection<CategoryShortDto> categories)
         {
-            _categories.Clear();
+            Categories.Clear();
             foreach (var category in categories)
             {
-                _categories.Add(category);
+                Categories.Add(category);
             }
         }
 
         private void LoadCategoryData()
         {
-            var category = _categoryModel.GetCategoryWithHierarchy(CategoryId);
+            var category = _categoryService.GetCategoryWithHierarchy(CategoryId);
             if (category != null)
             {
                 Name = category.Name;
@@ -88,7 +87,7 @@ namespace CompShop.ViewModels
                     ParentCategoryId = ParentCategoryId
                 };
 
-                _categoryModel.UpdateCategory(dto);
+                _categoryService.UpdateCategory(dto);
                 OnCategoryUpdated?.Invoke();
                 CloseAction?.Invoke();
             }
@@ -105,9 +104,7 @@ namespace CompShop.ViewModels
             CloseAction?.Invoke();
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

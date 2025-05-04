@@ -10,6 +10,7 @@ namespace ComputerShop.ViewModels
     {
         private readonly ICartService _cartService;
         private readonly int _cartId;
+
         public int ProductId { get; }
         public string ProductName { get; }
         public decimal Price { get; }
@@ -35,7 +36,8 @@ namespace ComputerShop.ViewModels
         public ICommand DecreaseQuantityCommand { get; }
         public ICommand RemoveItemCommand { get; }
 
-        public ICartService CartService => _cartService;
+        public event Action<CartItemVM>? OnRemoveRequested;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public CartItemVM(ICartService cartService, int cartId, CartItemDto dto)
         {
@@ -68,9 +70,6 @@ namespace ComputerShop.ViewModels
                 OnRemoveRequested?.Invoke(this);
             });
         }
-
-        public event Action<CartItemVM>? OnRemoveRequested;
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void OnPropertyChanged([CallerMemberName] string? name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

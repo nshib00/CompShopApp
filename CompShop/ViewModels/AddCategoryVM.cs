@@ -1,18 +1,17 @@
 ﻿using BLL.DTO;
+using BLL.Services.Interfaces;
 using ComputerShop.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using System.Windows;
-using BLL.Services.Interfaces;
+using System.Windows.Input;
 
 public class AddCategoryVM : INotifyPropertyChanged
 {
     private readonly ICategoryService _categoryService;
     private string _name;
     private int? _parentCategoryId;
-    private readonly ObservableCollection<CategoryShortDto> _categories = new ObservableCollection<CategoryShortDto>();
 
     public event Action OnCategoryAdded;
     public event PropertyChangedEventHandler PropertyChanged;
@@ -22,7 +21,10 @@ public class AddCategoryVM : INotifyPropertyChanged
     public AddCategoryVM(ICategoryService categoryService)
     {
         _categoryService = categoryService;
-        SaveCommand = new RelayCommand(_ => SaveCategory());
+
+        Categories = new ObservableCollection<CategoryShortDto>();
+
+        SaveCommand = new RelayCommand(_ => SaveCategory(), _ => CanSaveCategory());
         CancelCommand = new RelayCommand(_ => Cancel());
     }
 
@@ -33,6 +35,7 @@ public class AddCategoryVM : INotifyPropertyChanged
         {
             _name = value;
             OnPropertyChanged();
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 
@@ -46,18 +49,23 @@ public class AddCategoryVM : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<CategoryShortDto> Categories => _categories;
+    public ObservableCollection<CategoryShortDto> Categories { get; }
 
     public ICommand SaveCommand { get; }
     public ICommand CancelCommand { get; }
 
-    public void SetCategories(ObservableCollection<CategoryShortDto> categories)
+    public void SetCategories(IEnumerable<CategoryShortDto> categories)
     {
-        _categories.Clear();
+        Categories.Clear();
         foreach (var category in categories)
         {
-            _categories.Add(category);
+            Categories.Add(category);
         }
+    }
+
+    private bool CanSaveCategory()
+    {
+        return !string.IsNullOrWhiteSpace(Name);
     }
 
     private void SaveCategory()
@@ -83,7 +91,6 @@ public class AddCategoryVM : INotifyPropertyChanged
 
     private void Cancel()
     {
-
         CloseAction?.Invoke();
     }
 

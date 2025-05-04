@@ -1,5 +1,5 @@
 ﻿using BLL.DTO;
-using BLL.Services;
+using BLL.Services.Interfaces;
 using CompShop.Views;
 using ComputerShop.Commands;
 using ComputerShop.Views;
@@ -11,8 +11,9 @@ namespace CompShop.ViewModels
 {
     public class ProductVM : INotifyPropertyChanged
     {
-        private readonly ProductService _productModel = new();
-        private readonly CategoryService _categoryModel = new();
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
+
         private ObservableCollection<ProductDto> _products;
         private ObservableCollection<CategoryDto> _categories;
         private CategoryDto _selectedCategory;
@@ -22,8 +23,11 @@ namespace CompShop.ViewModels
         public ICommand EditProductCommand { get; }
         public ICommand DeleteProductCommand { get; }
 
-        public ProductVM()
+        public ProductVM(IProductService productService, ICategoryService categoryService)
         {
+            _productService = productService;
+            _categoryService = categoryService;
+
             AddProductCommand = new RelayCommand(AddProduct, CanExecuteAddProduct);
             EditProductCommand = new RelayCommand(EditProduct, CanExecuteEditProduct);
             DeleteProductCommand = new RelayCommand(DeleteProduct, CanExecuteDeleteProduct);
@@ -87,18 +91,18 @@ namespace CompShop.ViewModels
 
         private void LoadCategories()
         {
-            Categories = new ObservableCollection<CategoryDto>(_categoryModel.GetCategories());
+            Categories = new ObservableCollection<CategoryDto>(_categoryService.GetCategoriesWithData());
         }
 
         private void LoadProducts()
         {
             if (SelectedCategory == null)
             {
-                Products = new ObservableCollection<ProductDto>(_productModel.GetAllProducts());
+                Products = new ObservableCollection<ProductDto>(_productService.GetAllProducts());
             }
             else
             {
-                Products = new ObservableCollection<ProductDto>(_productModel.GetProductsByCategory(SelectedCategory.Id));
+                Products = new ObservableCollection<ProductDto>(_productService.GetProductsByCategory(SelectedCategory.Id));
             }
         }
 
@@ -109,46 +113,33 @@ namespace CompShop.ViewModels
             LoadProducts();
         }
 
-        private bool CanExecuteAddProduct(object parameter)
-        {
-            return true;
-        }
+        private bool CanExecuteAddProduct(object parameter) => true;
 
         private void EditProduct(object parameter)
         {
             if (parameter is ProductDto selectedProduct)
             {
-
                 var editWindow = new EditProductWindow();
                 editWindow.ShowDialog();
                 LoadProducts();
             }
         }
 
-        private bool CanExecuteEditProduct(object parameter)
-        {
-            return parameter is ProductDto;
-        }
+        private bool CanExecuteEditProduct(object parameter) => parameter is ProductDto;
 
         private void DeleteProduct(object parameter)
         {
             if (parameter is ProductDto selectedProduct)
             {
-                _productModel.DeleteProduct(selectedProduct.Id);
+                _productService.DeleteProduct(selectedProduct.Id);
                 LoadProducts();
             }
         }
 
-        private bool CanExecuteDeleteProduct(object parameter)
-        {
-            return parameter is ProductDto;
-        }
+        private bool CanExecuteDeleteProduct(object parameter) => parameter is ProductDto;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
+        protected virtual void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

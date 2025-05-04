@@ -15,7 +15,7 @@ namespace ComputerShop.ViewModels
     {
         private readonly PasswordBox _passwordBox;
         private readonly PasswordBox _confirmPasswordBox;
-        private readonly IUserService _userService = new UserService();
+        private readonly IUserService _userService;
 
         private string _firstName;
         private string _lastName;
@@ -25,10 +25,12 @@ namespace ComputerShop.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public RegistrationVM(PasswordBox passwordBox, PasswordBox confirmPasswordBox)
+        public RegistrationVM(PasswordBox passwordBox, PasswordBox confirmPasswordBox, IUserService userService)
         {
             _passwordBox = passwordBox;
             _confirmPasswordBox = confirmPasswordBox;
+            _userService = userService;
+
             RegisterCommand = new RelayCommand(Register, CanRegister);
         }
 
