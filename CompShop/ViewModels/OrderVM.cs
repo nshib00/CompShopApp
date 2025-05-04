@@ -1,9 +1,12 @@
 ﻿using BLL.DTO;
 using BLL.Services.Interfaces;
 using ComputerShop.Commands;
+using CompShop.Services.Interfaces;
 using ComputerShop.Views;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,11 +14,17 @@ public class OrderVM : INotifyPropertyChanged
 {
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
+    private readonly IDialogService _dialogService;
 
     private ObservableCollection<OrderDetailDto> _orderDetails;
     private string _deliveryAddress;
     private decimal _totalAmount;
+    private int _currentUserId;
 
+    // Событие для закрытия OrderWindow
+    public event Action OrderSuccessClosed;
+
+    // Public свойства
     public ObservableCollection<OrderDetailDto> OrderDetails
     {
         get => _orderDetails;
@@ -47,25 +56,32 @@ public class OrderVM : INotifyPropertyChanged
         }
     }
 
+    // Команды
     public ICommand ConfirmOrderCommand { get; }
     public ICommand BackCommand { get; }
+    public ICommand ReturnToCatalogCommand { get; }
 
-    public event Action CloseWindowRequested;
-
-    public OrderVM(int userId, IOrderService orderService, ICartService cartService)
+    // Конструктор (с DI)
+    public OrderVM(IOrderService orderService, ICartService cartService, IDialogService dialogService)
     {
         _orderService = orderService;
         _cartService = cartService;
+        _dialogService = dialogService;
 
-        LoadCartItemsAsOrderDetails(userId);
-
-        ConfirmOrderCommand = new RelayCommand(_ => ConfirmOrder(userId));
-        BackCommand = new RelayCommand(_ => CloseWindowRequested?.Invoke());
+        ConfirmOrderCommand = new RelayCommand(_ => ConfirmOrder());
+        BackCommand = new RelayCommand(_ => _dialogService.CloseDialog());
+        ReturnToCatalogCommand = new RelayCommand(_ => CloseOrderSuccess());
     }
 
-    private void LoadCartItemsAsOrderDetails(int userId)
+    public void Initialize(int userId)
     {
-        var cart = _cartService.GetCartByUserId(userId);
+        _currentUserId = userId;
+        LoadCartItemsAsOrderDetails();
+    }
+
+    private void LoadCartItemsAsOrderDetails()
+    {
+        var cart = _cartService.GetCartByUserId(_currentUserId);
         if (cart != null)
         {
             var details = cart.Items.Select(item => new OrderDetailDto
@@ -80,7 +96,7 @@ public class OrderVM : INotifyPropertyChanged
         }
     }
 
-    private void ConfirmOrder(int userId)
+    private void ConfirmOrder()
     {
         if (string.IsNullOrWhiteSpace(DeliveryAddress))
         {
@@ -96,18 +112,36 @@ public class OrderVM : INotifyPropertyChanged
 
         var order = new OrderCreateDto
         {
-            CustomerId = userId,
+            CustomerId = _currentUserId,
             DeliveryAddress = DeliveryAddress,
-            DeliveryCost = (new Random().Next() % 500) + 200,
+            DeliveryCost = new Random().Next(200, 700),
             Items = OrderDetails.ToList()
         };
 
         _orderService.CreateOrder(order);
 
-        var successWindow = new OrderSuccess();
+        // Показать окно успеха с правильным DataContext
+        var successWindow = new OrderSuccess
+        {
+            DataContext = this
+        };
         successWindow.Show();
 
-        CloseWindowRequested?.Invoke();
+        // Закрыть окно оформления заказа
+        _dialogService.CloseDialog();
+    }
+
+    private void CloseOrderSuccess()
+    {
+        // Вызвать событие (закрытие окна OrderSuccess)
+        OrderSuccessClosed?.Invoke();
+
+        // Найти и закрыть окно OrderSuccess
+        var window = Application.Current.Windows
+            .OfType<OrderSuccess>()
+            .FirstOrDefault();
+
+        window?.Close();
     }
 
     private void RecalculateTotal()
@@ -115,6 +149,7 @@ public class OrderVM : INotifyPropertyChanged
         TotalAmount = OrderDetails?.Sum(x => x.TotalPrice) ?? 0;
     }
 
+    // INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged(string propertyName) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

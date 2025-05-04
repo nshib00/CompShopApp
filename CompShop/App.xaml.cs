@@ -1,5 +1,7 @@
 ﻿using BLL.Services;
 using BLL.Services.Interfaces;
+using CompShop.Services;
+using CompShop.Services.Interfaces;
 using CompShop.ViewModels;
 using CompShop.Views.Admin.Reports;
 using CompShop.Views.Pages;
@@ -34,6 +36,8 @@ namespace CompShop
             services.AddSingleton<IReportService, ReportService>();
             services.AddSingleton<IUserService, UserService>();
 
+            services.AddSingleton<IDialogService, DialogService>();
+
             services.AddTransient<MainWindowVM>();
             services.AddTransient<ManufacturerVM>();
             services.AddTransient<AddCategoryVM>();
@@ -57,9 +61,24 @@ namespace CompShop
             services.AddTransient<ManufacturerPage>();
             services.AddTransient<CategoryOrdersForm>();
 
-            services.AddTransient<Func<CartVM>>(sp => () => sp.GetRequiredService<CartVM>());
             services.AddTransient<Func<int, EditCategoryVM>>(sp => id => ActivatorUtilities.CreateInstance<EditCategoryVM>(sp, id));
             services.AddTransient<Func<int, CategoryDetailsVM>>(sp => id => ActivatorUtilities.CreateInstance<CategoryDetailsVM>(sp, id));
+            services.AddTransient<Func<IDialogService, OrderVM>>(sp => dialogService =>
+                new OrderVM(
+                    sp.GetRequiredService<IOrderService>(),
+                    sp.GetRequiredService<ICartService>(),
+                    dialogService
+                ));
+            services.AddTransient<Func<IDialogService, CartVM>>(sp => dialogService =>
+                new CartVM(
+                    sp.GetRequiredService<ICartService>(),
+                    dialogService
+                ));
+            services.AddTransient<Func<CartVM>>(sp => () =>
+                new CartVM(
+                    sp.GetRequiredService<ICartService>(),
+                    new VoidDialogService()
+                ));
         }
     }
 }

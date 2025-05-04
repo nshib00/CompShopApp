@@ -1,10 +1,10 @@
 ﻿using BLL.Services.Interfaces;
+using CompShop.Services.Interfaces;
 using ComputerShop.Commands;
 using ComputerShop.Views;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,12 +13,13 @@ namespace ComputerShop.ViewModels
     public class CartVM : INotifyPropertyChanged
     {
         private readonly ICartService _cartService;
+        private readonly IDialogService _dialogService;
+
         private ObservableCollection<CartItemDto> _cartItems;
         private double _totalCartPrice;
         private int _currentUserId;
         private int _cartId;
 
-        public event Action CloseWindowRequested;
         public event Action CartUpdated;
 
         public ObservableCollection<CartItemDto> CartItems
@@ -59,16 +60,15 @@ namespace ComputerShop.ViewModels
         public ICommand ContinueShoppingCommand { get; }
         public ICommand CheckoutCommand { get; }
 
-        // Конструктор только для DI (без userId)
-        public CartVM(ICartService cartService)
+        public CartVM(ICartService cartService, IDialogService dialogService)
         {
             _cartService = cartService;
+            _dialogService = dialogService;
 
             ContinueShoppingCommand = new RelayCommand(ContinueShopping);
             CheckoutCommand = new RelayCommand(Checkout);
         }
 
-        // Метод инициализации после создания объекта
         public void Initialize(int userId)
         {
             _currentUserId = userId;
@@ -168,7 +168,6 @@ namespace ComputerShop.ViewModels
                     });
                 }
             }
-
             CartUpdated?.Invoke();
             RecalculateTotal();
         }
@@ -180,7 +179,7 @@ namespace ComputerShop.ViewModels
 
         private void ContinueShopping(object obj)
         {
-            CloseWindowRequested?.Invoke();
+            _dialogService.CloseDialog();
         }
 
         private void Checkout(object obj)
@@ -193,13 +192,11 @@ namespace ComputerShop.ViewModels
 
             var orderWindow = new OrderWindow(_currentUserId);
             orderWindow.Show();
-            CloseWindowRequested?.Invoke();
+            _dialogService.CloseDialog();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
+        protected virtual void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

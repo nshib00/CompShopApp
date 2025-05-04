@@ -13,7 +13,7 @@ public class CustomerVM : INotifyPropertyChanged
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
     private readonly ICartService _cartService;
-    private readonly Func<CartVM> _cartVmFactory; // фабрика CartVM из DI
+    private readonly Func<CartVM> _cartVmFactory;
 
     private ObservableCollection<ProductDto> _products;
     private ObservableCollection<CategoryDto> _categories;
@@ -162,7 +162,7 @@ public class CustomerVM : INotifyPropertyChanged
             cartViewModel.Initialize(_currentUser.Id);
             cartViewModel.CartUpdated += UpdateCartItemCount;
 
-            var cartWindow = new CartWindow(cartViewModel);
+            var cartWindow = new CartWindow(_currentUser.Id);
             cartWindow.Closed += (s, e) => UpdateCartItemCount();
             cartWindow.ShowDialog();
         }
